@@ -28,7 +28,7 @@ export default function MainLayout() {
       />
       <Tabs.Screen name="profile" 
         options={{
-          title: 'Home',
+          title: 'Profile',
           tabBarIcon:({color}) => <Ionicons name="person-outline" size={24} color="black" />}}
       />
     </Tabs>

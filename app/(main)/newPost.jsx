@@ -4,7 +4,7 @@ import React from 'react'
 const NewPost = () => {
   return (
     <View>
-      <Text>NewPost</Text>
+      <Text>doi test git</Text>
     </View>
   )
 }

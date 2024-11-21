@@ -1,14 +1,16 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import { StyleSheet, Text, View } from "react-native";
+import React from "react";
+import PetListByCategory from "../../components/Home/PetListByCategory";
 
-const Favorites = () => {
+const favorites = () => {
   return (
     <View>
-      <Text>Favorites</Text>
+      {/* petlist + category */}
+      <PetListByCategory />
     </View>
-  )
-}
+  );
+};
 
-export default Favorites
+export default favorites;
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({});

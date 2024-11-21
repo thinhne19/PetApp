@@ -1,10 +1,10 @@
-import { View, Text, StyleSheet, Image, Touchable } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import { theme } from '../../constants/theme'
-import { collection, doc, getDocs } from 'firebase/firestore'
-import { db } from '../../config/config'
-import { FlatList } from 'react-native'
-import { TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, Image, Touchable } from "react-native";
+import React, { useEffect, useState } from "react";
+import { theme } from "../../constants/theme";
+import { collection, doc, getDocs } from "firebase/firestore";
+import { db } from "../../config/config";
+import { FlatList } from "react-native";
+import { TouchableOpacity } from "react-native";
 
 export default function Category() {
 
@@ -14,15 +14,15 @@ export default function Category() {
         GetCategories();
     }, []);
 
-    const GetCategories = async() => {
-        setCategoryList([])
-        const snapshot = await getDocs(collection(db,'Category'));
-        snapshot.forEach((doc) => {
-            console.log(doc.data());
-            setCategoryList(categoryList=>[...categoryList, doc.data()]);
-        })
-    }
 
+  const GetCategories = async () => {
+    setCategoryList([]);
+    const snapshot = await getDocs(collection(db, "Category"));
+    snapshot.forEach((doc) => {
+      console.log(doc.data());
+      setCategoryList((categoryList) => [...categoryList, doc.data()]);
+    });
+  };
 
   return (
     <View style = {{marginTop: 20}}>
@@ -45,30 +45,25 @@ export default function Category() {
         )}
       />
     </View>
-  )
+  );
 }
 
-
 const styles = StyleSheet.create({
+  container: {
+    backgroundColor: "#fdf7d6",
+    padding: 20,
+    alignItems: "center",
+    borderWidth: 2,
+    borderRadius: 15,
+    margin: 15,
+  },
 
+  title: {
+    fontWeight: theme.fonts.bold,
+    fontSize: 20,
+  },
 
-    container:{
-        backgroundColor: '#fdf7d6',
-        padding : 20,
-        alignItems: 'center',
-        borderWidth: 2,
-        borderRadius : 15,
-        margin: 15
-    },
-
-    title: {
-        fontWeight: theme.fonts.bold,
-        fontSize: 20,
-    },
-
-    selected: {
-        backgroundColor : '#FFCC66'
-    }
-
-
-})
+  selected: {
+    backgroundColor: "#FFCC66",
+  },
+});

@@ -37,7 +37,7 @@ const Profile = () => {
                     />
                     <View style={styles.avatarBorder} />
                 </View>
-                <Text style={styles.name}>{user.fullName}</Text>
+                <Text style={styles.name}>{user.lastName}</Text>
                 <Text style={styles.email}>{user.primaryEmailAddress?.emailAddress}</Text>
             </View>
 
@@ -46,7 +46,7 @@ const Profile = () => {
                 {/* Account Settings */}
                 <Text style={styles.sectionTitle}>🐣 Tài khoản của bạn</Text>
                 
-                <TouchableOpacity style={styles.menuItem}>
+                <TouchableOpacity style={styles.menuItem} onPress={()=>router.push('/pfadmin')}>
                     <View style={styles.menuItemLeft}>
                         <MaterialCommunityIcons name="account-heart" size={24} color="#FF9999" />
                         <Text style={styles.menuItemText}>Thông tin chủ nuôi</Text>

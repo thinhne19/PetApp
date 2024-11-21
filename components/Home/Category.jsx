@@ -6,10 +6,10 @@ import { db } from '../../config/config'
 import { FlatList } from 'react-native'
 import { TouchableOpacity } from 'react-native'
 
-export default function Category({category}) {
+export default function Category() {
 
     const [categoryList, setCategoryList] = useState([]);
-    const [selectedcategory, setSelectedCategory] = useState('Dogs');
+    const [selectedcategory, setSelectedCategory] = useState();
     useEffect(() => {
         GetCategories();
     }, []);
@@ -26,14 +26,13 @@ export default function Category({category}) {
 
   return (
     <View style = {{marginTop: 20}}>
-      <Text style = {styles.title}>Pet's Food</Text>
+      <Text style = {styles.title}>Trending Categories</Text>
       <FlatList
         data={categoryList}
         numColumns={4}
         renderItem={({item, index}) => (
             <TouchableOpacity onPress={()=>{
                 setSelectedCategory(item.name);
-                category(item.name)
                 }}
                 style = {{flex:1}}>
                 <View style = {[styles.container, selectedcategory==item.name&&styles.selected]}>

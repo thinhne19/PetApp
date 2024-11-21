@@ -24,7 +24,7 @@ export default function Category({ category }) {
 
   return (
     <View style={{ marginTop: 20 }}>
-      <Text style={styles.title}>Pet's Food</Text>
+      <Text style={styles.title}>Category</Text>
       <FlatList
         data={categoryList}
         numColumns={4}

@@ -3,6 +3,7 @@ import React from "react";
 import { Stack } from "expo-router";
 import { ClerkProvider, ClerkLoaded } from "@clerk/clerk-expo";
 import * as SecureStore from "expo-secure-store";
+import { useFonts } from "expo-font";
 
 const tokenCache = {
   async getToken(key) {
@@ -32,6 +33,15 @@ const tokenCache = {
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
 const _layout = () => {
+  const [fontsLoaded] = useFonts({
+    outfit: require("./../assets/fonts/Outfit-Regular.ttf"),
+    "outfit-medium": require("./../assets/fonts/Outfit-Medium.ttf"),
+    "outfit-bold": require("./../assets/fonts/Outfit-Bold.ttf"),
+  });
+
+  if (!fontsLoaded) {
+    return null;
+  }
   return (
     <ClerkProvider tokenCache={tokenCache} publishableKey={publishableKey}>
       <Stack screenOptions={{ headerShown: false }}>

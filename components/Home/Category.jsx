@@ -5,6 +5,7 @@ import { collection, doc, getDocs } from "firebase/firestore";
 import { db } from "../../config/config";
 import { FlatList } from "react-native";
 import { TouchableOpacity } from "react-native";
+import Colors from "../../constants/Colors";
 
 export default function Category({ category }) {
   const [categoryList, setCategoryList] = useState([]);
@@ -47,7 +48,14 @@ export default function Category({ category }) {
                 style={{ width: 40, height: 40 }}
               />
             </View>
-            <Text style={{ textAlign: "center" }}>{item?.name}</Text>
+            <Text
+              style={{
+                textAlign: "center",
+                fontFamily: "outfit",
+              }}
+            >
+              {item?.name}
+            </Text>
           </TouchableOpacity>
         )}
       />
@@ -57,20 +65,22 @@ export default function Category({ category }) {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#fdf7d6",
-    padding: 20,
+    backgroundColor: Colors.LIGHT_PRIMARY,
+    padding: 15,
     alignItems: "center",
-    borderWidth: 2,
+    borderWidth: 1,
     borderRadius: 15,
-    margin: 15,
+    borderColor: Colors.PRIMARY,
+    margin: 5,
   },
 
   title: {
-    fontWeight: theme.fonts.bold,
+    fontFamily: "outfit-medium",
     fontSize: 20,
   },
 
   selected: {
-    backgroundColor: "#FFCC66",
+    backgroundColor: Colors.SECONDARY,
+    borderColor: Colors.SECONDARY,
   },
 });

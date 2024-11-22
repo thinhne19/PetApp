@@ -10,6 +10,7 @@ import React, { useEffect } from "react";
 import { useRouter } from "expo-router";
 import { useAuth, useUser } from "@clerk/clerk-expo";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import Colors from "../../constants/Colors";
 
 const Profile = () => {
   const router = useRouter();
@@ -57,7 +58,7 @@ const Profile = () => {
             <MaterialCommunityIcons
               name="account-heart"
               size={24}
-              color="#FF9999"
+              color={Colors.LIGHT_PINK}
             />
             <Text style={styles.menuItemText}>Thông tin chủ nuôi</Text>
           </View>
@@ -94,7 +95,7 @@ const Profile = () => {
             <MaterialCommunityIcons
               name="help-circle"
               size={24}
-              color="#FF9999"
+              color={Colors.LIGHT_PINK}
             />
             <Text style={styles.menuItemText}>Trợ giúp bạn nhé</Text>
           </View>
@@ -113,7 +114,7 @@ const Profile = () => {
             <MaterialCommunityIcons
               name="information"
               size={24}
-              color="#FF9999"
+              color={Colors.LIGHT_PINK}
             />
             <Text style={styles.menuItemText}>Về chúng mình</Text>
           </View>
@@ -139,10 +140,10 @@ export default Profile;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: Colors.WHITE,
   },
   header: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: Colors.WHITE,
     padding: 20,
     alignItems: "center",
     borderBottomLeftRadius: 30,
@@ -158,7 +159,7 @@ const styles = StyleSheet.create({
     height: 100,
     borderRadius: 50,
     borderWidth: 3,
-    borderColor: "#FFF",
+    borderColor: Colors.WHITE,
   },
   avatarBorder: {
     position: "absolute",
@@ -168,18 +169,18 @@ const styles = StyleSheet.create({
     bottom: -5,
     borderRadius: 60,
     borderWidth: 2,
-    borderColor: "#FFB366",
+    borderColor: Colors.PRIMARY,
     borderStyle: "dashed",
   },
   name: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#FF8533",
+    color: Colors.PRIMARY,
     marginTop: 10,
   },
   email: {
     fontSize: 16,
-    color: "#FF9966",
+    color: Colors.PRIMARY,
     marginTop: 5,
   },
   menuContainer: {
@@ -188,7 +189,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: "600",
-    color: "#FF8533",
+    color: Colors.PRIMARY,
     marginTop: 20,
     marginBottom: 10,
     // Thêm emoji vào title
@@ -201,7 +202,7 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 20,
     marginBottom: 10,
-    shadowColor: "#FFB366",
+    shadowColor: Colors.LIGHT_PRIMARY,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -217,18 +218,18 @@ const styles = StyleSheet.create({
   menuItemText: {
     fontSize: 16,
     marginLeft: 15,
-    color: "#FF8533",
+    color: Colors.PRIMARY,
     fontWeight: "500",
   },
   signOutButton: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#FFB366",
+    backgroundColor: Colors.PRIMARY,
     padding: 15,
     borderRadius: 25,
     marginTop: 30,
-    shadowColor: "#FFB366",
+    shadowColor: Colors.LIGHT_PRIMARY,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -238,7 +239,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   signOutText: {
-    color: "#FFF",
+    color: Colors.WHITE,
     fontSize: 18,
     fontWeight: "600",
     marginLeft: 10,

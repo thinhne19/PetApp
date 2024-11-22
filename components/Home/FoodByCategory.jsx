@@ -7,8 +7,10 @@ import Category from "./Category";
 
 export default function FoodByCategory() {
   const [foodList, setFoodList] = useState([]);
+  const [loader, setLoader] = useState(false);
 
   const getFoodListByCategory = async (category) => {
+    setLoader(true);
     const q = query(collection(db, "Foods"), where("category", "==", category));
     const querySnapshot = await getDocs(q);
     const foods = [];
@@ -18,6 +20,7 @@ export default function FoodByCategory() {
     });
 
     setFoodList(foods);
+    setLoader(false);
   };
 
   useEffect(() => {
@@ -32,6 +35,8 @@ export default function FoodByCategory() {
         data={foodList}
         style={{ marginTop: 10 }}
         horizontal={true}
+        refreshing={loader}
+        onRefresh={() => getFoodListByCategory("Dogs")}
         renderItem={({ item }) => <FoodListItem food={item} />}
         keyExtractor={(item, index) => index.toString()}
       />

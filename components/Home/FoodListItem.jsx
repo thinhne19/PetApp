@@ -39,18 +39,18 @@ export default function FoodListItem({ food }) {
       >
         <Text style={{ color: Colors.GRAY, fontFamily: "outfit" }}>
           Price :
-          <Text
-            style={{
-              fontFamily: "outfit",
-              color: Colors.PRIMARY,
-              paddingHorizontal: 7,
-              borderRadius: 10,
-              fontSize: 11,
-              backgroundColor: Colors.LIGHT_PRIMARY,
-            }}
-          >
-            {food.price}
-          </Text>
+        </Text>
+        <Text
+          style={{
+            fontFamily: "outfit",
+            color: Colors.PRIMARY,
+            paddingHorizontal: 7,
+            borderRadius: 10,
+            fontSize: 11,
+            backgroundColor: Colors.LIGHT_PRIMARY,
+          }}
+        >
+          {food.price}
         </Text>
       </View>
     </View>

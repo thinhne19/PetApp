@@ -1,15 +1,16 @@
 import { Stack, Tabs } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
-
+import Colors from "./../../constants/Colors";
 export default function MainLayout() {
   return (
-    <Tabs screenOptions={{ headerShown: false }}>
+    <Tabs screenOptions={{ tabBarActiveTintColor: Colors.PRIMARY }}>
       <Tabs.Screen
         name="home"
         options={{
           title: "Home",
+          headerShown: false,
           tabBarIcon: ({ color }) => (
-            <Ionicons name="home-outline" size={24} color="black" />
+            <Ionicons name="home" size={24} color={color} />
           ),
         }}
       />
@@ -17,8 +18,9 @@ export default function MainLayout() {
         name="favorites"
         options={{
           title: "Favorites",
+          headerShown: false,
           tabBarIcon: ({ color }) => (
-            <Ionicons name="heart-outline" size={24} color="black" />
+            <Ionicons name="heart" size={24} color={color} />
           ),
         }}
       />
@@ -26,8 +28,9 @@ export default function MainLayout() {
         name="newPost"
         options={{
           title: "Post",
+          headerShown: false,
           tabBarIcon: ({ color }) => (
-            <Ionicons name="add-circle-outline" size={24} color="black" />
+            <Ionicons name="add-circle" size={24} color={color} />
           ),
         }}
       />
@@ -35,8 +38,9 @@ export default function MainLayout() {
         name="notification"
         options={{
           title: "List",
+          headerShown: false,
           tabBarIcon: ({ color }) => (
-            <Ionicons name="calendar-outline" size={24} color="black" />
+            <Ionicons name="calendar" size={24} color={color} />
           ),
         }}
       />
@@ -44,8 +48,9 @@ export default function MainLayout() {
         name="profile"
         options={{
           title: "Profile",
+          headerShown: false,
           tabBarIcon: ({ color }) => (
-            <Ionicons name="person-outline" size={24} color="black" />
+            <Ionicons name="person" size={24} color={color} />
           ),
         }}
       />

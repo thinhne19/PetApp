@@ -6,14 +6,12 @@ import { db } from "../../config/config";
 import { FlatList } from "react-native";
 import { TouchableOpacity } from "react-native";
 
-export default function Category() {
-
-    const [categoryList, setCategoryList] = useState([]);
-    const [selectedcategory, setSelectedCategory] = useState();
-    useEffect(() => {
-        GetCategories();
-    }, []);
-
+export default function Category({ category }) {
+  const [categoryList, setCategoryList] = useState([]);
+  const [selectedcategory, setSelectedCategory] = useState("Dogs");
+  useEffect(() => {
+    GetCategories();
+  }, []);
 
   const GetCategories = async () => {
     setCategoryList([]);
@@ -25,23 +23,32 @@ export default function Category() {
   };
 
   return (
-    <View style = {{marginTop: 20}}>
-      <Text style = {styles.title}>Trending Categories</Text>
+    <View style={{ marginTop: 20 }}>
+      <Text style={styles.title}>Pet's Food</Text>
       <FlatList
         data={categoryList}
         numColumns={4}
-        renderItem={({item, index}) => (
-            <TouchableOpacity onPress={()=>{
-                setSelectedCategory(item.name);
-                }}
-                style = {{flex:1}}>
-                <View style = {[styles.container, selectedcategory==item.name&&styles.selected]}>
-                    <Image source={{uri:item?.imageUrl}}
-                        style={{width: 40, height: 40}}
-                    />
-                </View>
-                <Text style = {{textAlign: 'center'}}>{item?.name}</Text>
-            </TouchableOpacity>
+        renderItem={({ item, index }) => (
+          <TouchableOpacity
+            onPress={() => {
+              setSelectedCategory(item.name);
+              category(item.name);
+            }}
+            style={{ flex: 1 }}
+          >
+            <View
+              style={[
+                styles.container,
+                selectedcategory == item.name && styles.selected,
+              ]}
+            >
+              <Image
+                source={{ uri: item?.imageUrl }}
+                style={{ width: 40, height: 40 }}
+              />
+            </View>
+            <Text style={{ textAlign: "center" }}>{item?.name}</Text>
+          </TouchableOpacity>
         )}
       />
     </View>

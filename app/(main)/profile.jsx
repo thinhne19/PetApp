@@ -41,7 +41,7 @@ const Profile = () => {
           <Image source={{ uri: user.imageUrl }} style={styles.avatar} />
           <View style={styles.avatarBorder} />
         </View>
-        <Text style={styles.name}>{user.fullName}</Text>
+        <Text style={styles.name}>{user.lastName}</Text>
         <Text style={styles.email}>
           {user.primaryEmailAddress?.emailAddress}
         </Text>

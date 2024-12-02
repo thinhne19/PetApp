@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, Image, Touchable } from "react-native";
 import React, { useEffect, useState } from "react";
 import { theme } from "../../constants/theme";
 import { collection, doc, getDocs } from "firebase/firestore";
-import { db } from "../../config/config";
+import { db } from "../../config/firebaseConfig";
 import { FlatList } from "react-native";
 import { TouchableOpacity } from "react-native";
 import Colors from "../../constants/Colors";

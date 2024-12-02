@@ -9,6 +9,9 @@ import { useRouter } from 'expo-router'
 import RichTextBox from '../../components/RichTextPost'
 import * as ImagePicker from 'expo-image-picker';
 import { Video } from 'expo-av'
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+
 const NewPost = () => {
   const { user } = useUser();
   const bodyRef = useRef("");
@@ -16,6 +19,18 @@ const NewPost = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [file, setFile] = useState(file);
+
+
+  const resetForm = () => {
+    // Reset text content
+    bodyRef.current = "";
+    if (editorRef.current?.setContentHTML) {
+      editorRef.current.setContentHTML("");
+    }
+    // Reset file
+    setFile(null);
+  };
+
 
   const onPick = async (isImage) => {
     let mediaConfig = {
@@ -45,10 +60,33 @@ const NewPost = () => {
       return;
     }
 
-    let data = {
-      file,
+    const postData = {
+      avatar: user?.imageUrl,
+      name: user?.lastName,
       body: bodyRef.current,
-      userId : user?.id
+      date: new Date().toLocaleString(),
+      fileUri: file?.uri,
+    };
+
+    try {
+      // Lưu bài viết vào AsyncStorage
+      const existingPosts = await AsyncStorage.getItem('posts');
+      const posts = existingPosts ? JSON.parse(existingPosts) : [];
+      posts.push(postData);
+      await AsyncStorage.setItem('posts', JSON.stringify(posts));
+
+      Alert.alert('Success', 'Your post has been saved successfully!', [
+        {
+          text: 'OK',
+          onPress: () => {
+            resetForm(); // Reset form sau khi post thành công
+          }
+        }
+      ]);
+    } catch (error) {
+      Alert.alert('Error', 'Something went wrong while saving your post');
+    } finally {
+      setLoading(false);
     }
     //create post
   }
@@ -151,17 +189,18 @@ const NewPost = () => {
         </View>
       </ScrollView>
       <TouchableOpacity
-        onPress={onSubmit}
-        loading={loading}
-        hasShowdow={false}
+        onPress={onSubmit}  // Fixed the onPress syntax
+        disabled={loading}  // Added disabled property
         style={[
           styles.postButton,
-          styles.disabledButton
+          loading && styles.disabledButton  // Only apply disabledButton style when loading
         ]}
       >
-          <View style={styles.buttonContent}>
-            <Text style={styles.buttonText}>Post</Text>
-          </View>
+        <View style={styles.buttonContent}>
+          <Text style={styles.buttonText}>
+            {loading ? 'Posting...' : 'Post'}  {/* Added loading state text */}
+          </Text>
+        </View>
       </TouchableOpacity>
     </ScreenWrapper>
   )
@@ -274,5 +313,9 @@ const styles = StyleSheet.create({
     padding: 5,
     borderRadius: 50,
     backgroundColor: '#FF9900'
+  },
+  disabledButton: {
+    opacity: 0.7,
+    backgroundColor: '#FFCC66',
   }
 })

@@ -2,8 +2,7 @@ import { View, Text, FlatList, Image, StyleSheet, Dimensions } from 'react-nativ
 import React, { useEffect, useState } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from   
- '../../config/config'; // Assuming `db` is your Firebase Firestore instance
-
+ '../../config/firebaseConfig';
 const Slider = () => {
 
   const [sliderList, setSliderList] = useState([]);

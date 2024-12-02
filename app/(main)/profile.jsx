@@ -69,10 +69,22 @@ const Profile = () => {
           />
         </TouchableOpacity>
 
+        <TouchableOpacity style={styles.menuItem} onPress={()=>router.push('/memories')}>
+          <View style={styles.menuItemLeft}>
+          <MaterialCommunityIcons name="weather-cloudy-clock" size={24} color={Colors.LIGHT_PINK}/>
+            <Text style={styles.menuItemText}>Kỉ niệm ở đây</Text>
+          </View>
+          <MaterialCommunityIcons
+            name="chevron-right"
+            size={24}
+            color="#FFB366"
+          />
+        </TouchableOpacity>
+
         {/* App Settings */}
         <Text style={styles.sectionTitle}>🐰 Cài đặt ứng dụng</Text>
 
-        <TouchableOpacity style={styles.menuItem}>
+        <TouchableOpacity style={styles.menuItem} onPress={()=>router.push('/theme')}>
           <View style={styles.menuItemLeft}>
             <MaterialCommunityIcons name="palette" size={24} color="#FF9999" />
             <Text style={styles.menuItemText}>Giao diện dễ thương</Text>

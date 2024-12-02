@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, FlatList } from "react-native";
 import { collection, query, where, getDocs } from "firebase/firestore";
-import { db } from "../../config/config";
+import { db } from "../../config/firebaseConfig";
 import FoodListItem from "./FoodListItem";
 import Category from "./Category";
 

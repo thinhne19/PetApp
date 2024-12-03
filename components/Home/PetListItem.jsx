@@ -21,7 +21,7 @@ export default function PetListItem({ pet }) {
       }}
     >
       <Image
-        source={{ uri: pet?.imageUrl }}
+        source={{ uri: pet?.imagePath }}
         style={{
           width: 150,
           height: 135,

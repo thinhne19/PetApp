@@ -29,10 +29,22 @@ export default function PetListByCategory() {
       <FlatList
         data={petList}
         style={{ marginTop: 10 }}
-        horizontal={true}
+        numColumns={2}
         refreshing={loader}
         onRefresh={() => GetPetList("Dogs")}
-        renderItem={({ item, index }) => <PetListItem pet={item} />}
+        renderItem={({ item, index }) => (
+          <View
+            style={{
+              width: "50%",
+              paddingHorizontal: 5,
+              paddingVertical: 5,
+              alignItems: "flex-start", // Căn trái
+            }}
+          >
+            <PetListItem pet={item} />
+          </View>
+        )}
+        keyExtractor={(item, index) => index.toString()}
       />
     </View>
   );

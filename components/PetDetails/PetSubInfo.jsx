@@ -40,8 +40,8 @@ export default function PetSubInfo({ pet }) {
         />
         <PetSubInfoCard
           icon={require("./../../assets/images/weight.png")}
-          title={"Breed"}
-          value={pet?.weight + " Kg"}
+          title={"Weight"}
+          value={pet?.Weight + " Kg"}
         />
       </View>
     </View>

@@ -13,21 +13,30 @@ import React, { useEffect, useState } from "react";
 import Colors from "../../constants/Colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { collection, doc, getDocs, addDoc } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDocs,
+  addDoc,
+  updateDoc,
+} from "firebase/firestore";
 import { db } from "../../config/firebaseConfig";
 import { Picker } from "@react-native-picker/picker";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
-
+import UserPet from "./../../Shared/UserPet"; // Import UserPet service
+import { useUser } from "@clerk/clerk-expo";
 export default function AddNewPet() {
+  const { user } = useUser(); // Lấy thông tin user từ Clerk
+
   const router = useRouter();
   const [formData, setFormData] = useState({
     category: "Dogs",
     sex: "Male",
   });
-  const [gender, setGender] = useState();
+  const [gender, setGender] = useState("Male");
   const [categoryList, setCategoryList] = useState([]);
-  const [selectedcategory, setSelectedCategory] = useState();
+  const [selectedCategory, setSelectedCategory] = useState();
   const [image, setImage] = useState();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -123,10 +132,22 @@ export default function AddNewPet() {
   };
 
   const onSubmit = async () => {
-    // if (Object.keys(formData).length !== 4) {
-    //   ToastAndroid.show("Enter All Details", ToastAndroid.SHORT);
-    //   return;
-    // }
+    // Kiểm tra xem đã điền đủ thông tin chưa
+    const requiredFields = [
+      "name",
+      "category",
+      "breed",
+      "age",
+      "sex",
+      "Weight",
+      "about",
+    ];
+    const missingFields = requiredFields.filter((field) => !formData[field]);
+
+    if (missingFields.length > 0) {
+      ToastAndroid.show("Vui lòng điền đầy đủ thông tin", ToastAndroid.SHORT);
+      return;
+    }
 
     try {
       setIsLoading(true);
@@ -137,22 +158,32 @@ export default function AddNewPet() {
         localImagePath = await saveImageLocally(image);
       }
 
+      // Tạo ID duy nhất
+      const petId = `pet_${Date.now()}_${Math.random()
+        .toString(36)
+        .substr(2, 9)}`;
+
       // Tạo object data để lưu vào Firestore
       const petData = {
         ...formData,
+        id: petId, // Thêm ID ngay từ đầu
         imagePath: localImagePath, // Lưu đường dẫn local của ảnh
         createdAt: new Date().toISOString(),
+        ownerId: user?.primaryEmailAddress?.emailAddress, // Thêm email chủ sở hữu
       };
 
       // Thêm dữ liệu vào collection "Pets"
-      const docRef = await addDoc(collection(db, "Pets"), petData);
+      await addDoc(collection(db, "Pets"), petData);
 
-      ToastAndroid.show("Pet added successfully!", ToastAndroid.SHORT);
+      // Cập nhật danh sách pet cho user
+      await UserPet.UpdatePet(user, petId);
+
+      ToastAndroid.show("Thêm thú cưng thành công!", ToastAndroid.SHORT);
       router.back();
     } catch (error) {
-      console.error("Error adding pet: ", error);
+      console.error("Lỗi khi thêm thú cưng: ", error);
       ToastAndroid.show(
-        "Error adding pet. Please try again.",
+        "Lỗi khi thêm thú cưng. Vui lòng thử lại.",
         ToastAndroid.SHORT
       );
     } finally {
@@ -222,7 +253,7 @@ export default function AddNewPet() {
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Pet Category *</Text>
           <Picker
-            selectedValue={selectedcategory}
+            selectedValue={selectedCategory}
             style={styles.input}
             onValueChange={(itemValue, itemIndex) => {
               setSelectedCategory(itemValue);
@@ -253,11 +284,8 @@ export default function AddNewPet() {
           <Text style={styles.label}>Age *</Text>
           <TextInput
             style={styles.input}
-            keyboardType="numeric"
             onChangeText={(value) => {
-              if (/^\d+$/.test(value) || value === "") {
-                handleInputChange("age", value);
-              }
+              handleInputChange("age", value);
             }}
           />
         </View>
@@ -281,11 +309,8 @@ export default function AddNewPet() {
           <Text style={styles.label}>Weight *</Text>
           <TextInput
             style={styles.input}
-            keyboardType="numeric"
             onChangeText={(value) => {
-              if (/^\d+$/.test(value) || value === "") {
-                handleInputChange("Weight", value);
-              }
+              handleInputChange("Weight", value);
             }}
           />
         </View>

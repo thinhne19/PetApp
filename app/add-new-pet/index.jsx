@@ -28,7 +28,16 @@ import UserPet from "./../../Shared/UserPet"; // Import UserPet service
 import { useUser } from "@clerk/clerk-expo";
 export default function AddNewPet() {
   const { user } = useUser(); // Lấy thông tin user từ Clerk
+  const [petList, setPetList] = useState();
 
+  useEffect(() => {
+    user && GetUser();
+  }, [user]);
+  const GetUser = async () => {
+    const result = await UserPet.GetPetList(user);
+    console.log(result);
+    setPetList(result?.petId ? result?.petId : []);
+  };
   const router = useRouter();
   const [formData, setFormData] = useState({
     category: "Dogs",

@@ -198,10 +198,10 @@ export default function AddNewPet() {
         <Image
           source={require("./../../assets/images/dog-placeholder-images-5.png")}
           style={{
-            width: 100,
-            height: 100,
-            borderRadius: 15,
-            borderWidth: 1,
+            width: 120,
+            height: 120,
+            borderRadius: 60,
+            borderWidth: 2,
             borderColor: Colors.GRAY,
           }}
         />
@@ -235,10 +235,9 @@ export default function AddNewPet() {
         <Text style={styles.headerTitle}>Thêm Thú Cưng</Text>
       </View>
       <ScrollView style={{ padding: 20 }}>
-        <Text style={{ fontFamily: "outfit-medium", fontSize: 20 }}>
-          Add New Pet
-        </Text>
-        <Pressable onPress={imagePicker}>{renderImage(image)}</Pressable>
+        <View style={styles.imageContainer}>
+          <Pressable onPress={imagePicker}>{renderImage(image)}</Pressable>
+        </View>
 
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Pet Name *</Text>
@@ -358,23 +357,27 @@ const styles = StyleSheet.create({
     padding: 5,
   },
   headerTitle: {
+    marginLeft: 16,
     fontSize: 20,
-    fontWeight: "bold",
+    fontFamily: "outfit-bold",
     color: Colors.PRIMARY,
-    marginLeft: 15,
   },
   inputContainer: {
-    marginVertical: 5,
+    marginBottom: 16,
   },
   input: {
-    padding: 10,
-    backgroundColor: Colors.WHITE,
-    borderRadius: 7,
-    fontFamily: "outfit",
+    borderWidth: 1,
+    borderColor: Colors.GRAY,
+    borderRadius: 10,
+    padding: 12,
+    fontSize: 16,
+    fontFamily: "outfit-medium",
   },
   label: {
-    marginVertical: 5,
-    fontFamily: "outfit",
+    fontSize: 16,
+    fontFamily: "outfit-medium",
+    color: Colors.GRAY,
+    marginBottom: 8,
   },
   button: {
     padding: 15,
@@ -382,5 +385,9 @@ const styles = StyleSheet.create({
     borderRadius: 7,
     marginVertical: 10,
     marginBottom: 150,
+  },
+  imageContainer: {
+    alignItems: "center",
+    marginVertical: 16,
   },
 });

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -7,103 +7,188 @@ import {
   Image,
   TextInput,
   ScrollView,
-  Pressable,
   ToastAndroid,
 } from "react-native";
-import { useRouter, useLocalSearchParams } from "expo-router";
-import { doc, updateDoc, collection, getDocs } from "firebase/firestore";
-import { db } from "../../config/firebaseConfig";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { Picker } from "@react-native-picker/picker";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
-import Colors from "../../constants/Colors";
+import {
+  collection,
+  getDocs,
+  updateDoc,
+  query,
+  where,
+  doc,
+} from "firebase/firestore";
+import { db } from "./../../config/firebaseConfig";
+import Colors from "./../../constants/Colors";
+import { useUser } from "@clerk/clerk-expo";
 
-export default function UpdatePet() {
+export default function PetUpdateScreen() {
   const router = useRouter();
-  const pet = useLocalSearchParams();
+  const { user } = useUser();
+  const { petId } = useLocalSearchParams();
+
   const [formData, setFormData] = useState({
-    name: pet.name || "",
-    category: pet.category || "Dogs",
-    breed: pet.breed || "",
-    age: pet.age ? pet.age.toString() : "",
-    sex: pet.sex || "Male",
-    Weight: pet.Weight ? pet.Weight.toString() : "",
-    about: pet.about || "",
+    id: petId, // Keep the original ID
+    name: "",
+    category: "Dogs",
+    breed: "",
+    age: "",
+    sex: "Male",
+    Weight: "",
+    about: "",
+    imagePath: null,
   });
-  const [image, setImage] = useState(pet.imagePath);
+
   const [categoryList, setCategoryList] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("Dogs");
+  const [image, setImage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [firestoreDocumentId, setFirestoreDocumentId] = useState(null);
 
   useEffect(() => {
-    GetCategories();
-  }, []);
+    if (!petId) {
+      ToastAndroid.show("Không tìm thấy ID thú cưng", ToastAndroid.SHORT);
+      router.back();
+      return;
+    }
 
-  const GetCategories = async () => {
-    setCategoryList([]);
-    const snapshot = await getDocs(collection(db, "Category"));
-    snapshot.forEach((doc) => {
-      setCategoryList((categoryList) => [...categoryList, doc.data()]);
-    });
-  };
+    fetchCategories();
+    fetchPetDetails();
+  }, [petId]);
 
-  const handleInputChange = (fieldName, fieldValue) => {
-    setFormData((prev) => ({
-      ...prev,
-      [fieldName]: fieldValue,
-    }));
-  };
-
-  const imagePicker = async () => {
+  const fetchCategories = async () => {
     try {
-      const { status } =
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== "granted") {
-        ToastAndroid.show("Cần quyền truy cập thư viện", ToastAndroid.SHORT);
-        return;
-      }
+      const snapshot = await getDocs(collection(db, "Category"));
+      const categories = snapshot.docs.map((doc) => doc.data());
+      setCategoryList(categories);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      ToastAndroid.show("Không thể tải danh mục", ToastAndroid.SHORT);
+    }
+  };
 
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 0.8,
-      });
+  const fetchPetDetails = async () => {
+    try {
+      // Query to find pet by its 'id' field
+      const q = query(collection(db, "Pets"), where("id", "==", petId));
 
-      if (!result.canceled) {
-        const savedImageUri = await saveImageLocally(result.assets[0].uri);
-        setImage(savedImageUri);
+      const querySnapshot = await getDocs(q);
+
+      if (!querySnapshot.empty) {
+        // Get the first matching document
+        const petDoc = querySnapshot.docs[0];
+        const petData = petDoc.data();
+
+        // Save the Firestore document ID
+        setFirestoreDocumentId(petDoc.id);
+
+        // Update form data
+        setFormData({
+          ...petData,
+          id: petId, // Ensure original ID is preserved
+        });
+
+        setSelectedCategory(petData.category);
+        setImage(petData.imagePath);
+      } else {
+        ToastAndroid.show("Không tìm thấy thú cưng", ToastAndroid.SHORT);
+        router.back();
       }
     } catch (error) {
-      console.error("Lỗi chọn ảnh:", error);
-      ToastAndroid.show("Lỗi chọn ảnh", ToastAndroid.SHORT);
+      console.error("Error fetching pet details:", error);
+      ToastAndroid.show("Lỗi tải thông tin", ToastAndroid.SHORT);
+      router.back();
+    }
+  };
+
+  const handleImagePicker = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (status !== "granted") {
+      ToastAndroid.show("Cần quyền truy cập thư viện", ToastAndroid.SHORT);
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.8,
+    });
+
+    if (!result.canceled) {
+      const imageUri = result.assets[0].uri;
+      const savedImageUri = await saveImageLocally(imageUri);
+      setImage(savedImageUri);
+      handleInputChange("imagePath", savedImageUri);
     }
   };
 
   const saveImageLocally = async (sourceUri) => {
-    try {
-      const filename = `${Date.now()}.jpg`;
-      const destination = `${FileSystem.documentDirectory}pet_images/${filename}`;
-      await FileSystem.copyAsync({ from: sourceUri, to: destination });
-      return destination;
-    } catch (error) {
-      console.error("Lỗi lưu ảnh:", error);
-      throw error;
-    }
+    const filename = `${Date.now()}.jpg`;
+    const destination = `${FileSystem.documentDirectory}pet_images/${filename}`;
+
+    await FileSystem.makeDirectoryAsync(
+      FileSystem.documentDirectory + "pet_images",
+      { intermediates: true }
+    );
+
+    await FileSystem.copyAsync({ from: sourceUri, to: destination });
+    return destination;
   };
 
-  const onUpdate = async () => {
+  const handleInputChange = (field, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const validateForm = () => {
+    const requiredFields = [
+      "name",
+      "category",
+      "breed",
+      "age",
+      "sex",
+      "Weight",
+      "about",
+    ];
+
+    for (let field of requiredFields) {
+      if (!formData[field]) {
+        ToastAndroid.show(`Vui lòng điền ${field}`, ToastAndroid.SHORT);
+        return false;
+      }
+    }
+    return true;
+  };
+
+  const updatePet = async () => {
+    if (!validateForm()) return;
+
+    // Ensure we have the Firestore document ID
+    if (!firestoreDocumentId) {
+      ToastAndroid.show("Lỗi: Không tìm thấy tài liệu", ToastAndroid.SHORT);
+      return;
+    }
+
+    setIsLoading(true);
     try {
-      setIsLoading(true);
-      const petDocRef = doc(db, "Pets", pet.id);
+      // Reference the document using its Firestore document ID
+      const petRef = doc(db, "Pets", firestoreDocumentId);
 
       const updateData = {
         ...formData,
-        ...(image && { imagePath: image }), // Only add imagePath if image is truthy
+        imagePath: image,
         updatedAt: new Date().toISOString(),
       };
 
-      await updateDoc(petDocRef, updateData);
+      await updateDoc(petRef, updateData);
 
       ToastAndroid.show("Cập nhật thành công!", ToastAndroid.SHORT);
       router.back();
@@ -114,19 +199,6 @@ export default function UpdatePet() {
       setIsLoading(false);
     }
   };
-
-  const renderImage = () => {
-    if (!image) {
-      return (
-        <Image
-          source={require("./../../assets/images/dog-placeholder-images-5.png")}
-          style={styles.image}
-        />
-      );
-    }
-    return <Image source={{ uri: image }} style={styles.image} />;
-  };
-
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -140,29 +212,42 @@ export default function UpdatePet() {
             color={Colors.PRIMARY}
           />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Cập Nhật Thú Cưng</Text>
+        <Text style={styles.headerTitle}>Thêm Thú Cưng</Text>
       </View>
 
-      <ScrollView style={styles.scrollView}>
-        <Pressable onPress={imagePicker}>{renderImage()}</Pressable>
+      <ScrollView style={styles.contentContainer}>
+        <TouchableOpacity onPress={handleImagePicker}>
+          <View style={styles.imageContainer}>
+            {image ? (
+              <Image source={{ uri: image }} style={styles.petImage} />
+            ) : (
+              <Image
+                source={require("./../../assets/images/dog-placeholder-images-5.png")}
+                style={styles.petImage}
+              />
+            )}
+          </View>
+        </TouchableOpacity>
 
-        <View style={styles.inputContainer}>
+        <View style={styles.inputGroup}>
           <Text style={styles.label}>Tên Thú Cưng *</Text>
           <TextInput
             style={styles.input}
             value={formData.name}
             onChangeText={(value) => handleInputChange("name", value)}
+            placeholder="Nhập tên thú cưng"
           />
         </View>
 
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Loại Thú Cưng *</Text>
+        <View style={styles.inputGroup}>
+          <Text style={styles.label}>Danh Mục *</Text>
           <Picker
-            selectedValue={formData.category}
-            style={styles.input}
+            selectedValue={selectedCategory}
             onValueChange={(itemValue) => {
+              setSelectedCategory(itemValue);
               handleInputChange("category", itemValue);
             }}
+            style={styles.picker}
           >
             {categoryList.map((category, index) => (
               <Picker.Item
@@ -174,74 +259,68 @@ export default function UpdatePet() {
           </Picker>
         </View>
 
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Giống *</Text>
+        <View style={styles.inputGroup}>
+          <Text style={styles.label}>Giống Loài *</Text>
           <TextInput
             style={styles.input}
             value={formData.breed}
             onChangeText={(value) => handleInputChange("breed", value)}
+            placeholder="Nhập giống loài"
           />
         </View>
 
-        <View style={styles.inputContainer}>
+        <View style={styles.inputGroup}>
           <Text style={styles.label}>Tuổi *</Text>
           <TextInput
             style={styles.input}
-            keyboardType="numeric"
             value={formData.age}
-            onChangeText={(value) => {
-              if (/^\d+$/.test(value) || value === "") {
-                handleInputChange("age", value);
-              }
-            }}
+            onChangeText={(value) => handleInputChange("age", value)}
+            placeholder="Nhập tuổi"
+            keyboardType="numeric"
           />
         </View>
 
-        <View style={styles.inputContainer}>
+        <View style={styles.inputGroup}>
           <Text style={styles.label}>Giới Tính *</Text>
           <Picker
             selectedValue={formData.sex}
-            style={styles.input}
-            onValueChange={(itemValue) => {
-              handleInputChange("sex", itemValue);
-            }}
+            onValueChange={(itemValue) => handleInputChange("sex", itemValue)}
+            style={styles.picker}
           >
-            <Picker.Item label="Nam" value="Male" />
-            <Picker.Item label="Nữ" value="Female" />
+            <Picker.Item label="Đực" value="Male" />
+            <Picker.Item label="Cái" value="Female" />
           </Picker>
         </View>
 
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Cân Nặng *</Text>
+        <View style={styles.inputGroup}>
+          <Text style={styles.label}>Cân Nặng (kg) *</Text>
           <TextInput
             style={styles.input}
-            keyboardType="numeric"
             value={formData.Weight}
-            onChangeText={(value) => {
-              if (/^\d+$/.test(value) || value === "") {
-                handleInputChange("Weight", value);
-              }
-            }}
+            onChangeText={(value) => handleInputChange("Weight", value)}
+            placeholder="Nhập cân nặng"
+            keyboardType="numeric"
           />
         </View>
 
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Về Thú Cưng *</Text>
+        <View style={styles.inputGroup}>
+          <Text style={styles.label}>Mô Tả *</Text>
           <TextInput
-            style={styles.input}
-            multiline={true}
-            numberOfLines={5}
+            style={[styles.input, styles.textArea]}
             value={formData.about}
             onChangeText={(value) => handleInputChange("about", value)}
+            placeholder="Thêm mô tả về thú cưng"
+            multiline
+            numberOfLines={4}
           />
         </View>
 
         <TouchableOpacity
-          style={[styles.button, isLoading && { opacity: 0.7 }]}
-          onPress={onUpdate}
+          style={[styles.updateButton, isLoading && styles.disabledButton]}
+          onPress={updatePet}
           disabled={isLoading}
         >
-          <Text style={styles.buttonText}>
+          <Text style={styles.updateButtonText}>
             {isLoading ? "Đang Cập Nhật..." : "Cập Nhật"}
           </Text>
         </TouchableOpacity>
@@ -261,48 +340,66 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: Colors.LIGHT_PRIMARY,
   },
-  backButton: {
-    padding: 5,
-  },
   headerTitle: {
+    marginLeft: 16,
     fontSize: 20,
-    fontWeight: "bold",
+    fontFamily: "outfit-bold",
     color: Colors.PRIMARY,
-    marginLeft: 15,
   },
-  scrollView: {
-    padding: 20,
+  contentContainer: {
+    paddingHorizontal: 16,
   },
-  image: {
-    width: 100,
-    height: 100,
-    borderRadius: 15,
-    alignSelf: "center",
-    marginBottom: 20,
+  imageContainer: {
+    alignItems: "center",
+    marginVertical: 16,
   },
-  inputContainer: {
-    marginVertical: 10,
+  petImage: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    borderWidth: 2,
+    borderColor: Colors.GRAY,
   },
-  input: {
-    padding: 10,
-    backgroundColor: Colors.WHITE,
-    borderRadius: 7,
-    fontFamily: "outfit",
+  inputGroup: {
+    marginBottom: 16,
   },
   label: {
-    marginVertical: 5,
-    fontFamily: "outfit",
-  },
-  button: {
-    padding: 15,
-    backgroundColor: Colors.PRIMARY,
-    borderRadius: 7,
-    marginVertical: 10,
-    marginBottom: 50,
-  },
-  buttonText: {
+    fontSize: 16,
     fontFamily: "outfit-medium",
-    textAlign: "center",
+    color: Colors.GRAY,
+    marginBottom: 8,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: Colors.GRAY,
+    borderRadius: 10,
+    padding: 12,
+    fontSize: 16,
+    fontFamily: "outfit-medium",
+  },
+  picker: {
+    borderWidth: 1,
+    borderColor: Colors.GRAY,
+    borderRadius: 10,
+  },
+  textArea: {
+    height: 100,
+    textAlignVertical: "top",
+  },
+  updateButton: {
+    backgroundColor: Colors.PRIMARY,
+    padding: 16,
+    borderRadius: 10,
+    alignItems: "center",
+    marginTop: 16,
+    marginBottom: 32,
+  },
+  disabledButton: {
+    opacity: 0.7,
+  },
+  updateButtonText: {
     color: Colors.WHITE,
+    fontSize: 16,
+    fontFamily: "outfit-medium",
   },
 });

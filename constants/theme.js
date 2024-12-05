@@ -38,5 +38,17 @@ export const theme = {
         xxl: 22,
     },
 
+    light: {
+        theme: 'light',
+        textcolor: 'black',
+        background: 'white'
+    },
+    
+    dark: {
+        theme: 'dark',
+        textcolor: 'white',
+        background: 'black'
+    }
+
 
 } 

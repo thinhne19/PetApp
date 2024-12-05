@@ -8,6 +8,7 @@ import Icon from "../../assets/icons";
 import { useUser } from "@clerk/clerk-expo";
 import Slider from "../../components/Home/Slider";
 
+
 const Header = ({ title, mb = 10 }) => {
   const router = useRouter();
   const { user } = useUser();
@@ -57,6 +58,7 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: "outfit-medium",
     fontSize: hp(3.2),
+    color : '#E8B20E'
   },
 
   icons: {

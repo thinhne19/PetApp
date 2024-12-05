@@ -7,16 +7,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React from "react";
-import ScreenWrapper from "../../components/ScreenWrapper";
-import { useRouter } from "expo-router";
-import { theme } from "../../constants/theme";
-import { hp, wp } from "../../helpers/common";
-import Icon from "../../assets/icons";
+import { Link, useRouter } from "expo-router";
 import { useUser } from "@clerk/clerk-expo";
 import Slider from "../../components/Home/Slider";
 import Header from "../../components/Home/Header";
-import Category from "../../components/Home/Category";
 import FoodByCategory from "../../components/Home/FoodByCategory";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import Colors from "../../constants/Colors";
@@ -35,7 +29,7 @@ const Home = () => {
       {/*List Food*/}
 
       {/* new pet */}
-      <TouchableOpacity style={styles.addNewPetContainer}>
+      <Link href={"/add-new-pet"} style={styles.addNewPetContainer}>
         <MaterialIcons name="pets" size={24} color={Colors.PRIMARY} />
         <Text
           style={{
@@ -46,7 +40,7 @@ const Home = () => {
         >
           Add New Pet
         </Text>
-      </TouchableOpacity>
+      </Link>
     </View>
   );
 };
@@ -61,6 +55,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 20,
     marginTop: 20,
+    textAlign: "center",
     backgroundColor: Colors.LIGHT_PRIMARY,
     borderWidth: 1,
     borderColor: Colors.PRIMARY,

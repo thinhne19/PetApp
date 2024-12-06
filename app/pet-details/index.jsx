@@ -17,12 +17,17 @@ import Colors from "../../constants/Colors";
 import { useUser } from "@clerk/clerk-expo";
 import deletePet from "../../components/DeleteBtn";
 import * as FileSystem from "expo-file-system";
+import PetHealthRecord from "../../components/PetDetails/PetHealthRecord ";
+
 export default function PetDetails() {
   const { user } = useUser();
   const router = useRouter();
   const pet = useLocalSearchParams();
   const navigation = useNavigation();
 
+  useEffect(() => {
+    console.log("Pet Data in Details:", pet);
+  }, []);
   useEffect(() => {
     navigation.setOptions({
       headerTransparent: true,
@@ -117,7 +122,9 @@ export default function PetDetails() {
         <PetSubInfo pet={pet} />
         {/* About */}
         <AboutPet pet={pet} />
-        <View style={{ height: 70 }}></View>
+        <View style={{ height: 20 }}></View>
+        <PetHealthRecord petId={pet.id || pet._id} />
+        <View style={{ height: 50 }}></View>
       </ScrollView>
 
       {/* Edit pet */}
@@ -125,7 +132,7 @@ export default function PetDetails() {
         <Link
           href={{
             pathname: "/pet-update",
-            params: { petId: pet.id }, // Pass the specific pet's ID
+            params: { petId: pet.id || pet._id }, // Pass the specific pet's ID
           }}
           style={styles.editBtn}
         >

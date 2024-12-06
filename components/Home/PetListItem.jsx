@@ -1,10 +1,14 @@
 import { View, Text, Image, TouchableOpacity } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import Colors from "../../constants/Colors";
 import { useRouter } from "expo-router";
 
 export default function PetListItem({ pet }) {
   const router = useRouter();
+
+  useEffect(() => {
+    console.log("Pet Data in Details:", pet);
+  }, []);
   return (
     <TouchableOpacity
       onPress={() =>

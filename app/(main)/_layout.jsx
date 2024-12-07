@@ -17,7 +17,7 @@ export default function MainLayout() {
       <Tabs.Screen
         name="favorites"
         options={{
-          title: "Favorites",
+          title: "Pets",
           headerShown: false,
           tabBarIcon: ({ color }) => (
             <Ionicons name="heart" size={24} color={color} />

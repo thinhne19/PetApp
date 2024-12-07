@@ -14,13 +14,13 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import {
   collection,
-  addDoc,
-  query,
   where,
-  getDocs,
+  query,
   doc,
-  deleteDoc,
-  orderBy,
+  getDocs,
+  updateDoc,
+  arrayUnion,
+  arrayRemove,
 } from "firebase/firestore";
 import { db } from "./../../config/firebaseConfig";
 import Colors from "./../../constants/Colors";
@@ -52,95 +52,79 @@ const PetHealthRecord = ({ petId }) => {
   }, [petId]);
   const fetchHealthRecords = async () => {
     try {
-      // Fetch weight records
-      const weightQuery = query(
-        collection(db, "weightRecords"),
-        where("id", "==", petId),
-        orderBy("createdAt", "desc")
-      );
-      const weightDocs = await getDocs(weightQuery);
-      setWeightRecords(
-        weightDocs.docs.map((doc) => ({
-          ...doc.data(),
-          firestoreId: doc.id, // Add this line to store the Firestore document ID
-        }))
-      );
+      const q = query(collection(db, "Pets"), where("id", "==", petId));
 
-      // Do the same for vaccine and deworm records
-      const vaccineQuery = query(
-        collection(db, "vaccineRecords"),
-        where("id", "==", petId),
-        orderBy("createdAt", "desc")
-      );
-      const vaccineDocs = await getDocs(vaccineQuery);
-      setVaccineRecords(
-        vaccineDocs.docs.map((doc) => ({
-          ...doc.data(),
-          firestoreId: doc.id,
-        }))
-      );
-
-      const dewormQuery = query(
-        collection(db, "dewormRecords"),
-        where("id", "==", petId),
-        orderBy("createdAt", "desc")
-      );
-      const dewormDocs = await getDocs(dewormQuery);
-      setDewormRecords(
-        dewormDocs.docs.map((doc) => ({
-          ...doc.data(),
-          firestoreId: doc.id,
-        }))
-      );
+      const querySnapshot = await getDocs(q);
+      // Kiểm tra xem querySnapshot có dữ liệu không
+      if (!querySnapshot.empty) {
+        const petDoc = querySnapshot.docs[0]; // Lấy document đầu tiên
+        const petData = petDoc.data();
+        setWeightRecords(petData.healthRecords.weightRecords || []);
+        setVaccineRecords(petData.healthRecords.vaccineRecords || []);
+        setDewormRecords(petData.healthRecords.dewormRecords || []);
+      }
     } catch (error) {
       console.error("Error fetching health records:", error);
       Alert.alert("Error", "Failed to load health records");
     }
   };
-
   const addRecord = async () => {
     try {
-      let collectionName = "";
-      let data = {
-        id: petId, // Sử dụng id thay vì petId để khớp với collection Pets
-        date: formatDate(date),
-        notes,
-        createdAt: new Date(),
-      };
+      const q = query(collection(db, "Pets"), where("id", "==", petId));
+      const querySnapshot = await getDocs(q);
 
-      switch (recordType) {
-        case "weight":
-          collectionName = "weightRecords";
-          data = { ...data, weight: parseFloat(weight) };
-          break;
-        case "vaccine":
-          collectionName = "vaccineRecords";
-          data = {
-            ...data,
-            vaccineName,
-            nextDueDate: formatDate(nextDueDate),
-          };
-          break;
-        case "deworm":
-          collectionName = "dewormRecords";
-          data = {
-            ...data,
-            medicineName: notes,
-            nextDueDate: formatDate(nextDueDate),
-          };
-          break;
+      if (!querySnapshot.empty) {
+        const petDocRef = querySnapshot.docs[0].ref;
+
+        // Tạo đối tượng chung cho tất cả các bản ghi
+        const commonRecordData = {
+          date: formatDate(date), // Sử dụng ngày đã chọn
+          notes: notes, // Ghi chú (nếu có)
+        };
+
+        let updateData = {};
+        switch (recordType) {
+          case "weight":
+            updateData = {
+              "healthRecords.weightRecords": arrayUnion({
+                ...commonRecordData,
+                weight: parseFloat(weight),
+              }),
+            };
+            break;
+          case "vaccine":
+            updateData = {
+              "healthRecords.vaccineRecords": arrayUnion({
+                ...commonRecordData,
+                vaccineName,
+                nextDueDate: formatDate(nextDueDate),
+              }),
+            };
+            break;
+          case "deworm":
+            updateData = {
+              "healthRecords.dewormRecords": arrayUnion({
+                ...commonRecordData,
+                medicineName: notes,
+                nextDueDate: formatDate(nextDueDate),
+              }),
+            };
+            break;
+        }
+
+        await updateDoc(petDocRef, updateData);
+
+        Alert.alert("Thành công", "Đã thêm bản ghi mới");
+        setModalVisible(false);
+        clearForm();
+        fetchHealthRecords();
       }
-
-      await addDoc(collection(db, collectionName), data);
-      Alert.alert("Thành công", "Đã thêm bản ghi mới");
-      setModalVisible(false);
-      clearForm();
-      fetchHealthRecords();
     } catch (error) {
       console.error("Error adding record:", error);
       Alert.alert("Lỗi", "Không thể thêm bản ghi");
     }
   };
+
   const onDateChange = (event, selectedDate) => {
     const currentDate = ensureDate(selectedDate);
     // Reset trạng thái picker
@@ -162,24 +146,38 @@ const PetHealthRecord = ({ petId }) => {
     setNotes("");
     setVaccineName("");
   };
-  deleteRecord = async (recordId, type) => {
+  const deleteRecord = async (record, type) => {
     try {
-      let collectionName = "";
-      switch (type) {
-        case "weight":
-          collectionName = "weightRecords";
-          break;
-        case "vaccine":
-          collectionName = "vaccineRecords";
-          break;
-        case "deworm":
-          collectionName = "dewormRecords";
-          break;
-      }
+      const q = query(collection(db, "Pets"), where("id", "==", petId));
+      const querySnapshot = await getDocs(q);
 
-      await deleteDoc(doc(db, collectionName, recordId));
-      Alert.alert("Thành công", "Xóa bản ghi thành công");
-      fetchHealthRecords();
+      if (!querySnapshot.empty) {
+        const petDocRef = querySnapshot.docs[0].ref;
+
+        let updateData = {};
+        switch (type) {
+          case "weight":
+            updateData = {
+              "healthRecords.weightRecords": arrayRemove(record),
+            };
+            break;
+          case "vaccine":
+            updateData = {
+              "healthRecords.vaccineRecords": arrayRemove(record),
+            };
+            break;
+          case "deworm":
+            updateData = {
+              "healthRecords.dewormRecords": arrayRemove(record),
+            };
+            break;
+        }
+
+        await updateDoc(petDocRef, updateData);
+
+        Alert.alert("Thành công", "Xóa bản ghi thành công");
+        fetchHealthRecords();
+      }
     } catch (error) {
       console.error("Error deleting record:", error);
       Alert.alert("Lỗi", "Không thể xóa bản ghi");
@@ -197,15 +195,18 @@ const PetHealthRecord = ({ petId }) => {
         {/* Weight Records */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Cân nặng</Text>
-          {weightRecords.map((record) => (
-            <View key={record.id} style={styles.recordItem}>
+          {weightRecords.map((record, index) => (
+            <View
+              key={record.date + "-weight-" + index}
+              style={styles.recordItem}
+            >
               <View>
                 <Text>Cân nặng: {record.weight}kg</Text>
                 <Text>Ngày: {record.date}</Text>
                 {record.notes && <Text>Ghi chú: {record.notes}</Text>}
               </View>
               <TouchableOpacity
-                onPress={() => deleteRecord(record.firestoreId, "weight")}
+                onPress={() => deleteRecord(record, "weight")}
                 style={styles.deleteButton}
               >
                 <MaterialCommunityIcons
@@ -221,8 +222,11 @@ const PetHealthRecord = ({ petId }) => {
         {/* Vaccine Records */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Tiêm phòng</Text>
-          {vaccineRecords.map((record) => (
-            <View key={record.id} style={styles.recordItem}>
+          {vaccineRecords.map((record, index) => (
+            <View
+              key={record.date + "-vaccine-" + index}
+              style={styles.recordItem}
+            >
               <View>
                 <Text>Vaccine: {record.vaccineName}</Text>
                 <Text>Ngày tiêm: {record.date}</Text>
@@ -230,7 +234,7 @@ const PetHealthRecord = ({ petId }) => {
                 {record.notes && <Text>Ghi chú: {record.notes}</Text>}
               </View>
               <TouchableOpacity
-                onPress={() => deleteRecord(record.firestoreId, "vaccine")}
+                onPress={() => deleteRecord(record, "vaccine")}
                 style={styles.deleteButton}
               >
                 <MaterialCommunityIcons
@@ -246,15 +250,18 @@ const PetHealthRecord = ({ petId }) => {
         {/* Deworming Records */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Xổ giun</Text>
-          {dewormRecords.map((record) => (
-            <View key={record.id} style={styles.recordItem}>
+          {dewormRecords.map((record, index) => (
+            <View
+              key={record.date + "-deworm-" + index}
+              style={styles.recordItem}
+            >
               <View>
                 <Text>Ngày xổ giun: {record.date}</Text>
                 <Text>Ngày xổ giun tiếp theo: {record.nextDueDate}</Text>
                 {record.notes && <Text>Thuốc: {record.notes}</Text>}
               </View>
               <TouchableOpacity
-                onPress={() => deleteRecord(record.firestoreId, "deworm")}
+                onPress={() => deleteRecord(record, "deworm")}
                 style={styles.deleteButton}
               >
                 <MaterialCommunityIcons

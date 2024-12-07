@@ -179,6 +179,12 @@ export default function AddNewPet() {
         imagePath: localImagePath, // Lưu đường dẫn local của ảnh
         createdAt: new Date().toISOString(),
         ownerId: user?.primaryEmailAddress?.emailAddress, // Thêm email chủ sở hữu
+        // Thêm cấu trúc healthRecords
+        healthRecords: {
+          weightRecords: [],
+          vaccineRecords: [],
+          dewormRecords: [],
+        },
       };
 
       // Thêm dữ liệu vào collection "Pets"

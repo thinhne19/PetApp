@@ -1,5 +1,7 @@
 import { Stack, Tabs } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import Colors from "./../../constants/Colors";
 export default function MainLayout() {
   return (
@@ -17,10 +19,10 @@ export default function MainLayout() {
       <Tabs.Screen
         name="favorites"
         options={{
-          title: "Pets",
+          title: "Pet",
           headerShown: false,
           tabBarIcon: ({ color }) => (
-            <Ionicons name="heart" size={24} color={color} />
+            <MaterialIcons name="pets" size={24} color={color} />
           ),
         }}
       />
@@ -35,12 +37,16 @@ export default function MainLayout() {
         }}
       />
       <Tabs.Screen
-        name="notification"
+        name="statistics"
         options={{
-          title: "List",
+          title: "Statistics",
           headerShown: false,
           tabBarIcon: ({ color }) => (
-            <Ionicons name="calendar" size={24} color={color} />
+            <MaterialCommunityIcons
+              name="newspaper-variant"
+              size={24}
+              color={color}
+            />
           ),
         }}
       />

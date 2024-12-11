@@ -116,41 +116,41 @@ export default function FavoritesList() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: Colors.WHITE,
+    backgroundColor: Colors.BACKGROUND_COLOR,
   },
   container: {
     flex: 1,
-    backgroundColor: Colors.WHITE,
+    backgroundColor: Colors.BACKGROUND_COLOR,
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 15,
-    paddingHorizontal: 20,
+    padding: 20,
     backgroundColor: Colors.LIGHT_PRIMARY,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
   backButton: {
     padding: 5,
-    marginRight: 15,
   },
   headerTitle: {
+    marginLeft: 16,
     fontSize: 20,
-    fontWeight: "bold",
+    fontFamily: "outfit-bold",
     color: Colors.PRIMARY,
   },
   petItemContainer: {
     width: "100%",
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.LIGHT_GRAY,
+    padding: 15,
+    marginVertical: 8,
+    backgroundColor: Colors.WHITE,
+    borderRadius: 12,
+    shadowColor: Colors.BLACK,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   listContent: {
+    paddingHorizontal: 15,
     paddingBottom: 20,
   },
   emptyListContainer: {
@@ -160,15 +160,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   emptyListText: {
-    color: Colors.GRAY,
-    fontSize: 18,
+    color: Colors.DARK_GRAY,
+    fontSize: 20,
     fontWeight: "600",
     textAlign: "center",
   },
   emptyListSubtext: {
     color: Colors.GRAY,
-    fontSize: 14,
+    fontSize: 16,
     marginTop: 10,
     textAlign: "center",
+  },
+  refreshIndicator: {
+    marginTop: 20,
   },
 });

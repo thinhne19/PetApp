@@ -100,7 +100,7 @@ export default function PetDetails() {
           />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>My Pets</Text>
-        {/* Thêm nút xóa vào header */}
+
         <View style={{ flex: 1, alignItems: "flex-end" }}>
           <TouchableOpacity
             style={styles.deleteButton}
@@ -109,7 +109,7 @@ export default function PetDetails() {
             <MaterialCommunityIcons
               name="delete"
               size={36}
-              color={Colors.RED} // Giả sử bạn có màu RED trong Colors
+              color={Colors.PRIMARY} // Giả sử bạn có màu RED trong Colors
             />
           </TouchableOpacity>
         </View>
@@ -154,10 +154,14 @@ const styles = StyleSheet.create({
     padding: 5,
   },
   headerTitle: {
+    marginLeft: 16,
     fontSize: 20,
-    fontWeight: "bold",
+    fontFamily: "outfit-bold",
     color: Colors.PRIMARY,
-    marginLeft: 15,
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: 20,
   },
   scrollContent: {
     flexGrow: 1,
@@ -179,5 +183,4 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: Colors.WHITE,
   },
-  deleteButton: {},
 });

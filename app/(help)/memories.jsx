@@ -1,13 +1,50 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Alert, Platform  } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Colors from "../../constants/Colors";
+import * as Notifications from 'expo-notifications';
 
 export default function Memories() {
   const [posts, setPosts] = useState([]);
   const navigation = useNavigation();
+
+
+  useEffect(() => {
+    // Xử lý khi nhấn vào thông báo
+    const subscription = Notifications.addNotificationResponseReceivedListener(response => {
+      const postId = response.notification.request.content.data.postId;
+      // Chuyển đến chi tiết bài viết nếu cần
+      navigation.navigate('MemoryDetail', { postId });
+    });
+  
+    return () => subscription.remove();
+  }, []);
+
+
+
+  useEffect(() => {
+    // Đăng ký quyền thông báo
+    const requestNotificationPermission = async () => {
+      const { status } = await Notifications.requestPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Thông báo', 'Bạn cần cấp quyền để nhận thông báo');
+      }
+    };
+  
+    // Đặt cấu hình thông báo
+    Notifications.setNotificationHandler({
+      handleNotification: async () => ({
+        shouldShowAlert: true,
+        shouldPlaySound: true,
+        shouldSetBadge: false,
+      }),
+    });
+  
+    requestNotificationPermission();
+  }, []);
+
 
   useEffect(() => {
     loadPosts();
@@ -16,12 +53,35 @@ export default function Memories() {
   const loadPosts = async () => {
     try {
       const storedPosts = await AsyncStorage.getItem('posts');
+      console.log('Stored posts:', storedPosts);
+      
       if (storedPosts) {
-        setPosts(JSON.parse(storedPosts));
+        const parsedPosts = JSON.parse(storedPosts);
+        console.log('Parsed posts:', parsedPosts);
+        
+        setPosts(parsedPosts);
+  
+        parsedPosts.forEach(post => {
+          console.log('Processing post:', post);
+          scheduleMemoryNotification(post);
+        });
       }
     } catch (error) {
       console.error('Error loading posts from AsyncStorage', error);
     }
+  };
+
+  const scheduleMemoryNotification = async (post) => {
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "Kỉ niệm của bạn",
+        body: `Hãy nhìn lại kỉ niệm "${post.body.slice(0, 30)}..." từ ${post.date}`,
+        data: { postId: post.id },
+      },
+      trigger: {
+        seconds: 60, // 1 phút
+      },
+    });
   };
 
   const deletePost = async (index) => {

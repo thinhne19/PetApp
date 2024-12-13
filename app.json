@@ -1,5 +1,6 @@
 {
   "expo": {
+    "permissions": ["LOCATION"],
     "name": "DoAnChuyenNganh",
     "slug": "DoAnChuyenNganh",
     "version": "1.0.0",
@@ -32,6 +33,12 @@
         "expo-image-picker",
         {
           "photosPermission": "The app accesses your photos to let you share them with your friends."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
         }
       ]
     ],

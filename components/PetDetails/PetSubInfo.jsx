@@ -1,6 +1,5 @@
-import { View, Text, Image } from "react-native";
+import { View } from "react-native";
 import React from "react";
-import Colors from "../../constants/Colors";
 import PetSubInfoCard from "./PetSubInfoCard";
 
 export default function PetSubInfo({ pet }) {

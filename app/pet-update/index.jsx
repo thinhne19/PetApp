@@ -50,6 +50,7 @@ export default function PetUpdateScreen() {
   const [firestoreDocumentId, setFirestoreDocumentId] = useState(null);
 
   useEffect(() => {
+    console.log("Received petId:", petId); // Thêm dòng này
     if (!petId) {
       ToastAndroid.show("Không tìm thấy ID thú cưng", ToastAndroid.SHORT);
       router.back();
@@ -82,6 +83,16 @@ export default function PetUpdateScreen() {
         // Get the first matching document
         const petDoc = querySnapshot.docs[0];
         const petData = petDoc.data();
+
+        // Kiểm tra quyền truy cập
+        if (!user || user.emailAddresses[0].emailAddress !== petData.ownerId) {
+          ToastAndroid.show(
+            "Bạn không có quyền xem thông tin thú cưng này",
+            ToastAndroid.SHORT
+          );
+          router.back();
+          return;
+        }
 
         // Save the Firestore document ID
         setFirestoreDocumentId(petDoc.id);
@@ -169,6 +180,15 @@ export default function PetUpdateScreen() {
   };
 
   const updatePet = async () => {
+    // Kiểm tra xem người dùng hiện tại có phải là chủ sở hữu không
+    if (!user || user.emailAddresses[0].emailAddress !== formData.ownerId) {
+      ToastAndroid.show(
+        "Bạn không có quyền chỉnh sửa thú cưng này",
+        ToastAndroid.SHORT
+      );
+      return;
+    }
+
     if (!validateForm()) return;
 
     // Ensure we have the Firestore document ID

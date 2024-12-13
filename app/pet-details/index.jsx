@@ -17,12 +17,17 @@ import Colors from "../../constants/Colors";
 import { useUser } from "@clerk/clerk-expo";
 import deletePet from "../../components/DeleteBtn";
 import * as FileSystem from "expo-file-system";
+import PetHealthRecord from "../../components/PetDetails/PetHealthRecord ";
+
 export default function PetDetails() {
   const { user } = useUser();
   const router = useRouter();
   const pet = useLocalSearchParams();
   const navigation = useNavigation();
 
+  useEffect(() => {
+    console.log("Pet Data in Details:", pet);
+  }, []);
   useEffect(() => {
     navigation.setOptions({
       headerTransparent: true,
@@ -95,7 +100,7 @@ export default function PetDetails() {
           />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>My Pets</Text>
-        {/* Thêm nút xóa vào header */}
+
         <View style={{ flex: 1, alignItems: "flex-end" }}>
           <TouchableOpacity
             style={styles.deleteButton}
@@ -104,7 +109,7 @@ export default function PetDetails() {
             <MaterialCommunityIcons
               name="delete"
               size={36}
-              color={Colors.RED} // Giả sử bạn có màu RED trong Colors
+              color={Colors.PRIMARY} // Giả sử bạn có màu RED trong Colors
             />
           </TouchableOpacity>
         </View>
@@ -117,7 +122,9 @@ export default function PetDetails() {
         <PetSubInfo pet={pet} />
         {/* About */}
         <AboutPet pet={pet} />
-        <View style={{ height: 70 }}></View>
+        <View style={{ height: 20 }}></View>
+        <PetHealthRecord petId={pet.id || pet._id} />
+        <View style={{ height: 50 }}></View>
       </ScrollView>
 
       {/* Edit pet */}
@@ -125,7 +132,7 @@ export default function PetDetails() {
         <Link
           href={{
             pathname: "/pet-update",
-            params: { petId: pet.id }, // Pass the specific pet's ID
+            params: { petId: pet.id || pet._id }, // Pass the specific pet's ID
           }}
           style={styles.editBtn}
         >
@@ -147,10 +154,14 @@ const styles = StyleSheet.create({
     padding: 5,
   },
   headerTitle: {
+    marginLeft: 16,
     fontSize: 20,
-    fontWeight: "bold",
+    fontFamily: "outfit-bold",
     color: Colors.PRIMARY,
-    marginLeft: 15,
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: 20,
   },
   scrollContent: {
     flexGrow: 1,
@@ -172,5 +183,4 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: Colors.WHITE,
   },
-  deleteButton: {},
 });

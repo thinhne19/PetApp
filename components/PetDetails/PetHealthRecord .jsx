@@ -69,7 +69,7 @@ const PetHealthRecord = ({ petId }) => {
       }
     } catch (error) {
       console.error("Error fetching health records:", error);
-      Alert.alert("Error", "Failed to load health records.");
+      Alert.alert("Error", "Không thể tải hồ sơ sức khỏe.");
     }
   };
 
@@ -185,12 +185,12 @@ const PetHealthRecord = ({ petId }) => {
 
         await updateDoc(petDocRef, updateData);
 
-        Alert.alert("Success", "Record has been deleted.");
+        Alert.alert("Thành công", "Bản ghi đã bị xóa.");
         fetchHealthRecords();
       }
     } catch (error) {
       console.error("Error deleting record:", error);
-      Alert.alert("Error", "Could not delete the record.");
+      Alert.alert("Lỗi", "Không thể xóa bản ghi.");
     }
   };
 
@@ -198,25 +198,25 @@ const PetHealthRecord = ({ petId }) => {
   const formatDate = (date) => {
     if (!date) return "";
     const dateObj = date instanceof Date ? date : new Date(date);
-    return dateObj.toLocaleDateString("en-US");
+    return dateObj.toLocaleDateString("vie-VN");
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Health Records</Text>
+      <Text style={styles.title}>Hồ sơ sức khỏe</Text>
       <ScrollView style={styles.recordsContainer}>
         {/* Hiển thị danh sách cân nặng */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Weight Records</Text>
+          <Text style={styles.sectionTitle}>Hồ sơ cân nặng</Text>
           {weightRecords.map((record, index) => (
             <View
               key={record.date + "-weight-" + index}
               style={styles.recordItem}
             >
               <View>
-                <Text>Weight: {record.weight}kg</Text>
-                <Text>Date: {record.date}</Text>
-                {record.notes && <Text>Notes: {record.notes}</Text>}
+                <Text>Cân nặng: {record.weight}kg</Text>
+                <Text>Ngày: {record.date}</Text>
+                {record.notes && <Text>Ghi chú: {record.notes}</Text>}
               </View>
               <TouchableOpacity
                 onPress={() => deleteRecord(record, "weight")}
@@ -234,17 +234,17 @@ const PetHealthRecord = ({ petId }) => {
 
         {/* Vaccine Records */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Vaccine Records</Text>
+          <Text style={styles.sectionTitle}>Hồ sơ tiêm phòng</Text>
           {vaccineRecords.map((record, index) => (
             <View
               key={record.date + "-vaccine-" + index}
               style={styles.recordItem}
             >
               <View>
-                <Text>Vaccine: {record.vaccineName}</Text>
-                <Text>Date: {record.date}</Text>
-                <Text>Next Due Date: {record.nextDueDate}</Text>
-                {record.notes && <Text>Notes: {record.notes}</Text>}
+                <Text>Tiêm: {record.vaccineName}</Text>
+                <Text>Ngày: {record.date}</Text>
+                <Text>Ngày tiếp theo: {record.nextDueDate}</Text>
+                {record.notes && <Text>Ghi chú: {record.notes}</Text>}
               </View>
               <TouchableOpacity
                 onPress={() => deleteRecord(record, "vaccine")}
@@ -262,16 +262,16 @@ const PetHealthRecord = ({ petId }) => {
 
         {/* Deworming Records */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Deworming Records</Text>
+          <Text style={styles.sectionTitle}>Hồ sơ tẩy giun</Text>
           {dewormRecords.map((record, index) => (
             <View
               key={record.date + "-deworm-" + index}
               style={styles.recordItem}
             >
               <View>
-                <Text>Date: {record.date}</Text>
-                <Text>Next Due Date: {record.nextDueDate}</Text>
-                {record.notes && <Text>Medicine: {record.notes}</Text>}
+                <Text>Ngày: {record.date}</Text>
+                <Text>Ngày tiếp theo: {record.nextDueDate}</Text>
+                {record.notes && <Text>Thuốc: {record.notes}</Text>}
               </View>
               <TouchableOpacity
                 onPress={() => deleteRecord(record, "deworm")}
@@ -297,7 +297,7 @@ const PetHealthRecord = ({ petId }) => {
             setModalVisible(true);
           }}
         >
-          <Text style={styles.buttonText}>+ Add Weight</Text>
+          <Text style={styles.buttonText}>+ Thêm cân nặng</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.addButton}
@@ -306,7 +306,7 @@ const PetHealthRecord = ({ petId }) => {
             setModalVisible(true);
           }}
         >
-          <Text style={styles.buttonText}>+ Add Vaccine</Text>
+          <Text style={styles.buttonText}>+ Thêm tiêm phòng</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.addButton}
@@ -315,7 +315,7 @@ const PetHealthRecord = ({ petId }) => {
             setModalVisible(true);
           }}
         >
-          <Text style={styles.buttonText}>+ Add Deworming</Text>
+          <Text style={styles.buttonText}>+ Thêm tẩy giun</Text>
         </TouchableOpacity>
       </View>
 
@@ -330,19 +330,19 @@ const PetHealthRecord = ({ petId }) => {
           <View style={styles.modalContainer}>
             <Text style={styles.modalHeader}>
               {recordType === "weight"
-                ? "Add Weight Record"
+                ? "Thêm hồ sơ cân nặng"
                 : recordType === "vaccine"
-                ? "Add Vaccine Record"
-                : "Add Deworming Record"}
+                ? "Thêm hồ sơ tiêm phòng"
+                : "Thêm hồ sơ tẩy giun"}
             </Text>
 
             <View style={styles.modalContent}>
               {recordType === "weight" && (
                 <View style={styles.inputGroup}>
-                  <Text style={styles.inputLabel}>Weight</Text>
+                  <Text style={styles.inputLabel}>Cân nặng</Text>
                   <TextInput
                     style={styles.inputField}
-                    placeholder="Enter weight (kg)"
+                    placeholder="Thêm cân nặng (kg)"
                     keyboardType="numeric"
                     value={weight}
                     onChangeText={setWeight}
@@ -352,10 +352,10 @@ const PetHealthRecord = ({ petId }) => {
 
               {recordType === "vaccine" && (
                 <View style={styles.inputGroup}>
-                  <Text style={styles.inputLabel}>Vaccine Name</Text>
+                  <Text style={styles.inputLabel}>Tên tiêm phòng</Text>
                   <TextInput
                     style={styles.inputField}
-                    placeholder="Enter vaccine name"
+                    placeholder="Thêm tên tiêm phòng"
                     value={vaccineName}
                     onChangeText={setVaccineName}
                   />
@@ -363,7 +363,7 @@ const PetHealthRecord = ({ petId }) => {
               )}
 
               <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Date</Text>
+                <Text style={styles.inputLabel}>Ngày</Text>
                 <TouchableOpacity
                   style={styles.datePickerButton}
                   onPress={() => {
@@ -382,7 +382,7 @@ const PetHealthRecord = ({ petId }) => {
 
               {(recordType === "vaccine" || recordType === "deworm") && (
                 <View style={styles.inputGroup}>
-                  <Text style={styles.inputLabel}>Next Due Date</Text>
+                  <Text style={styles.inputLabel}>Ngày tiếp theo</Text>
                   <TouchableOpacity
                     style={styles.datePickerButton}
                     onPress={() => {
@@ -403,10 +403,10 @@ const PetHealthRecord = ({ petId }) => {
               )}
 
               <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Notes</Text>
+                <Text style={styles.inputLabel}>Ghi chú</Text>
                 <TextInput
                   style={styles.notesInput}
-                  placeholder="Add notes (optional)"
+                  placeholder="Thêm ghi chú (Tùy chọn)"
                   multiline
                   value={notes}
                   onChangeText={setNotes}
@@ -421,10 +421,10 @@ const PetHealthRecord = ({ petId }) => {
                     clearForm();
                   }}
                 >
-                  <Text style={styles.cancelButtonText}>Cancel</Text>
+                  <Text style={styles.cancelButtonText}>Hủy</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.saveButton} onPress={addRecord}>
-                  <Text style={styles.saveButtonText}>Save</Text>
+                  <Text style={styles.saveButtonText}>Lưu</Text>
                 </TouchableOpacity>
               </View>
             </View>

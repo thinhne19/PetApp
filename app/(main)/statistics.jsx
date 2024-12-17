@@ -25,7 +25,7 @@ export default function PetHealthStatistics() {
 
       const email = user?.primaryEmailAddress?.emailAddress;
       if (!email) {
-        console.error("User email not found.");
+        console.error("Không tìm thấy email người dùng.");
         setLoading(false);
         return;
       }
@@ -48,7 +48,7 @@ export default function PetHealthStatistics() {
 
         petList.push({
           id: pet.id,
-          name: pet.name || "Unnamed",
+          name: pet.name || "Không tên",
           weightRecords: sortedWeightRecords,
           vaccineRecords,
           dewormRecords,
@@ -57,7 +57,7 @@ export default function PetHealthStatistics() {
 
       setPets(petList);
     } catch (error) {
-      console.error("Error fetching health records:", error);
+      console.error("Lỗi khi tải dữ liệu sức khỏe:", error);
     } finally {
       setLoading(false);
     }
@@ -112,12 +112,12 @@ export default function PetHealthStatistics() {
             }}
           />
         ) : (
-          <Text style={styles.noDataText}>No weight data available</Text>
+          <Text style={styles.noDataText}>Không có dữ liệu cân nặng</Text>
         )}
 
         {/* Tiêm phòng */}
         <View style={styles.recordSection}>
-          <Text style={styles.recordTitle}>📌 Vaccination:</Text>
+          <Text style={styles.recordTitle}>📌 Tiêm phòng:</Text>
           {vaccineRecords.length > 0 ? (
             vaccineRecords.map((record, index) => (
               <Text key={`vaccine-${index}`} style={styles.recordItem}>
@@ -125,13 +125,13 @@ export default function PetHealthStatistics() {
               </Text>
             ))
           ) : (
-            <Text style={styles.noDataText}>No vaccination data available</Text>
+            <Text style={styles.noDataText}>Không có dữ liệu tiêm phòng</Text>
           )}
         </View>
 
         {/* Xổ giun */}
         <View style={styles.recordSection}>
-          <Text style={styles.recordTitle}>🐾 Deworming:</Text>
+          <Text style={styles.recordTitle}>🐾 Xổ giun:</Text>
           {dewormRecords.length > 0 ? (
             dewormRecords.map((record, index) => (
               <Text key={`deworm-${index}`} style={styles.recordItem}>
@@ -139,7 +139,7 @@ export default function PetHealthStatistics() {
               </Text>
             ))
           ) : (
-            <Text style={styles.noDataText}>No deworming data available</Text>
+            <Text style={styles.noDataText}>Không có dữ liệu xổ giun</Text>
           )}
         </View>
       </View>
@@ -150,7 +150,7 @@ export default function PetHealthStatistics() {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={Colors.PRIMARY} />
-        <Text style={styles.loadingText}>Loading data...</Text>
+        <Text style={styles.loadingText}>Đang tải dữ liệu...</Text>
       </View>
     );
   }
@@ -159,9 +159,9 @@ export default function PetHealthStatistics() {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerText}>Pet Statistics</Text>
+        <Text style={styles.headerText}>Thống kê Sức khỏe Thú cưng</Text>
         <Text style={styles.subHeaderText}>
-          Track your pets' health and records!
+          Theo dõi sức khỏe và hồ sơ của thú cưng của bạn!
         </Text>
       </View>
 
@@ -174,7 +174,7 @@ export default function PetHealthStatistics() {
         nestedScrollEnabled={true} // Kích hoạt cuộn lồng nhau
         ListEmptyComponent={() => (
           <Text style={styles.emptyListText}>
-            No pets with health records found.
+            Không tìm thấy thú cưng có hồ sơ sức khỏe.
           </Text>
         )}
       />

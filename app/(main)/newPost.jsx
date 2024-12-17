@@ -1,62 +1,58 @@
-import React, { useRef, useState } from 'react'
-import { ScrollView, StyleSheet, Image, Text, View, TouchableOpacity, Button, Pressable, Alert } from 'react-native'
-import { theme } from '../../constants/theme'
-import { hp, wp } from '../../helpers/common'
-import ScreenWrapper from '../../components/ScreenWrapper'
-import { useUser } from '@clerk/clerk-expo'
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'
-import { useRouter } from 'expo-router'
-import RichTextBox from '../../components/RichTextPost'
-import * as ImagePicker from 'expo-image-picker';
-import { Video } from 'expo-av'
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import React, { useRef, useState } from "react";
+import {
+  ScrollView,
+  StyleSheet,
+  Image,
+  Text,
+  View,
+  TouchableOpacity,
+  Pressable,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
+import { useUser } from "@clerk/clerk-expo";
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import RichTextBox from "../../components/RichTextPost";
+import * as ImagePicker from "expo-image-picker";
+import { Video } from "expo-av";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import Colors from "../../constants/Colors";
 
 const NewPost = () => {
   const { user } = useUser();
   const bodyRef = useRef("");
-  const editorRef = useRef(null);
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [file, setFile] = useState(file);
-
+  const [file, setFile] = useState(null);
 
   const resetForm = () => {
-    // Reset text content
     bodyRef.current = "";
-    if (editorRef.current?.setContentHTML) {
-      editorRef.current.setContentHTML("");
-    }
-    // Reset file
     setFile(null);
   };
 
-
   const onPick = async (isImage) => {
-    let mediaConfig = {
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+    const mediaConfig = {
+      mediaTypes: isImage
+        ? ImagePicker.MediaTypeOptions.Images
+        : ImagePicker.MediaTypeOptions.Videos,
       allowsEditing: true,
       aspect: [4, 3],
-      quality: 0.7,
-    }
-    if (!isImage) {
-      mediaConfig = {
-        mediaTypes: ImagePicker.MediaTypeOptions.Videos,
-        allowsEditing: true,
-      }
-    }
-    let result = await ImagePicker.launchImageLibraryAsync(mediaConfig)
+      quality: 0.8,
+    };
+    const result = await ImagePicker.launchImageLibraryAsync(mediaConfig);
 
-    console.log('file : ', result.assets[0])
     if (!result.canceled) {
       setFile(result.assets[0]);
     }
-  }
+  };
 
   const onSubmit = async () => {
-    if(!bodyRef.current && !file)
-    {
-      Alert.alert('Post', "Please choose an image or add post")
+    if (!bodyRef.current && !file) {
+      Alert.alert(
+        "Bài đăng",
+        "Vui lòng thêm nội dung hoặc tải lên một tập tin"
+      );
       return;
     }
 
@@ -69,253 +65,182 @@ const NewPost = () => {
     };
 
     try {
-      // Lưu bài viết vào AsyncStorage
-      const existingPosts = await AsyncStorage.getItem('posts');
+      const existingPosts = await AsyncStorage.getItem("posts");
       const posts = existingPosts ? JSON.parse(existingPosts) : [];
       posts.push(postData);
-      await AsyncStorage.setItem('posts', JSON.stringify(posts));
+      await AsyncStorage.setItem("posts", JSON.stringify(posts));
 
-      Alert.alert('Success', 'Your post has been saved successfully!', [
-        {
-          text: 'OK',
-          onPress: () => {
-            resetForm(); // Reset form sau khi post thành công
-          }
-        }
+      Alert.alert("Thành công", "Bài đăng của bạn đã được lưu thành công!", [
+        { text: "OK", onPress: resetForm },
       ]);
     } catch (error) {
-      Alert.alert('Error', 'Something went wrong while saving your post');
+      Alert.alert("Lỗi", "Đã xảy ra lỗi khi lưu bài đăng của bạn");
     } finally {
       setLoading(false);
     }
-    //create post
-  }
+  };
 
-  const isLocalFile = file => {
-    if(!file) return null;
-    if(typeof file =='object') return true;
+  const getFileType = (file) =>
+    file?.type || (file?.uri.includes("postImage") ? "hình ảnh" : "video");
 
-    return false;
-  }
-
-  const getFileType = file => {
-    if(!file) return null;
-    if(isLocalFile(file)) {
-      return file.type;
-    }
-
-    //check image or video for remote file
-    if(file.includes('postImage')) {
-      return 'image';
-    }
-    return 'video';
-  }
-
-
-  const getFileUri = file => {
-    if(!file) return null;
-    if(isLocalFile(file)) {
-      return file.uri;
-    }
-  }
   return (
-    <ScreenWrapper bg="#FFFFFF">
+    <View style={styles.container}>
       <ScrollView
-        contentContainerStyle={styles.container}
+        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
+        <Text style={styles.title}>Tạo Bài Viết</Text>
 
-        {/* Nội dung post */}
-        <View style={styles.createPostContainer}>
-          <Text style={styles.createPostText}>Create Post</Text>
+        {/* Thông tin người dùng */}
+        <View style={styles.userInfo}>
+          <Image source={{ uri: user?.imageUrl }} style={styles.avatar} />
+          <Text style={styles.userName}>{user?.lastName}</Text>
         </View>
 
-        {/* Header Profile */}
-        <View style={styles.userInfoContainer}>
-          {/* Avatar */}
-          <View style={styles.avatarWrapper}>
-            <Image
-              source={{ uri: user?.imageUrl }}
-              style={styles.avatar}
-            />
+        {/* Trình soạn thảo văn bản phong phú */}
+        <RichTextBox onChange={(body) => (bodyRef.current = body)} />
+
+        {/* Xem trước phương tiện */}
+        {file && (
+          <View style={styles.filePreview}>
+            {getFileType(file) === "video" ? (
+              <Video
+                source={{ uri: file.uri }}
+                style={styles.media}
+                useNativeControls
+                resizeMode="cover"
+              />
+            ) : (
+              <Image source={{ uri: file.uri }} style={styles.media} />
+            )}
+            <Pressable
+              style={styles.deleteButton}
+              onPress={() => setFile(null)}
+            >
+              <Ionicons name="trash-outline" size={24} color={Colors.WHITE} />
+            </Pressable>
           </View>
+        )}
 
-          {/* Thông tin người dùng */}
-          <View style={styles.name}>
-            <Text style={styles.name}>
-              {user?.lastName}
-            </Text>
-          </View>
-        </View>
-        <View>
-          <RichTextBox editorRef={editorRef} onChange={body => bodyRef.current = body} />
-        </View>
-
-        {
-          file && (
-            <View style = {styles.file}>
-              {
-                getFileType(file) == 'video'? (
-                  <Video
-                    style = {{flex: 1}}
-                    source={{uri:getFileUri(file)}}
-                    useNativeControls
-                    resizeMode='cover'
-                    isLooping
-                  />
-                ) : (
-                  <Image source={{uri: getFileUri(file) }} resizeMode='cover' style = {{flex: 1}}/>
-                )
-              }
-
-              <Pressable style={styles.delete} onPress={() => setFile(null)}>
-              <Ionicons name="trash-outline" size={24} color="black" />
-              </Pressable>
-
-            </View>
-          )
-        }
-
-        <View style={styles.media}>
-          <Text style={styles.addImageText}>Add to your post</Text>
+        {/* Thêm Phương tiện */}
+        <View style={styles.mediaOptions}>
+          <Text style={styles.mediaText}>Thêm vào bài viết của bạn</Text>
           <View style={styles.mediaIcons}>
             <TouchableOpacity onPress={() => onPick(true)}>
-              <Ionicons name="images-outline" size={24} color="black" />
+              <Ionicons
+                name="images-outline"
+                size={28}
+                color={Colors.PRIMARY}
+              />
             </TouchableOpacity>
             <TouchableOpacity onPress={() => onPick(false)}>
-              <Ionicons name="videocam-outline" size={28} color="black" />
+              <Ionicons
+                name="videocam-outline"
+                size={28}
+                color={Colors.PRIMARY}
+              />
             </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
-      <TouchableOpacity
-        onPress={onSubmit}  // Fixed the onPress syntax
-        disabled={loading}  // Added disabled property
-        style={[
-          styles.postButton,
-          loading && styles.disabledButton  // Only apply disabledButton style when loading
-        ]}
-      >
-        <View style={styles.buttonContent}>
-          <Text style={styles.buttonText}>
-            {loading ? 'Posting...' : 'Post'}  {/* Added loading state text */}
-          </Text>
-        </View>
-      </TouchableOpacity>
-    </ScreenWrapper>
-  )
-}
 
-export default NewPost
+      {/* Nút Gửi */}
+      <TouchableOpacity
+        style={[styles.submitButton, loading && styles.disabledButton]}
+        onPress={onSubmit}
+        disabled={loading}
+      >
+        {loading ? (
+          <ActivityIndicator size="small" color={Colors.WHITE} />
+        ) : (
+          <Text style={styles.submitText}>Đăng</Text>
+        )}
+      </TouchableOpacity>
+    </View>
+  );
+};
+
+export default NewPost;
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
-    backgroundColor: '#FFFFFF',
+    flex: 1,
+    backgroundColor: Colors.WHITE,
   },
-  createPostContainer: {
-    backgroundColor: 'white',
-    padding: 16,
-  },
-  createPostText: {
-    color: '#FF9900',
-    fontWeight: 'bold',
-    fontSize: 24,
-    textAlign: 'center'
-  },
-  userInfoContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 16,
-    marginLeft: 16,
-  },
-  avatarWrapper: {
-    position: 'relative',
-    marginRight: 12,
-  },
-  avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 20,
-    borderWidth: 3,
-    borderColor: '#FFFFFF',
-  },
-  name: {
-    color: 'black',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  postContainer: {
+  scrollContent: {
     padding: 20,
   },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#FF8533',
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: Colors.PRIMARY,
     marginBottom: 20,
-    textAlign: 'center',
+    textAlign: "center",
+  },
+  userInfo: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  avatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 10,
+  },
+  userName: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: Colors.GRAY,
+  },
+  filePreview: {
+    marginTop: 20,
+    borderRadius: 10,
+    overflow: "hidden",
+    position: "relative",
+    height: 200,
   },
   media: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    borderWidth: 1.5,
-    padding: 12,
-    paddingHorizontal: 18,
-    borderRadius: theme.radius.xl,
-    borderCurve: 'continuous',
-    borderColor: theme.colors.gray
+    width: "100%",
+    height: "100%",
+  },
+  deleteButton: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    backgroundColor: Colors.RED,
+    padding: 5,
+    borderRadius: 20,
+  },
+  mediaOptions: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 20,
+  },
+  mediaText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: Colors.GRAY,
   },
   mediaIcons: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 15
+    flexDirection: "row",
+    gap: 15,
   },
-  addImageText: {
-    fontSize: hp(1.9),
-    fontWeight: theme.fonts.semibold,
-    color: theme.colors.text
+  submitButton: {
+    backgroundColor: Colors.PRIMARY,
+    paddingVertical: 15,
+    borderRadius: 10,
+    margin: 20,
+    alignItems: "center",
+    justifyContent: "center",
   },
-  buttonContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
-    marginRight: 8,
-  },
-  postButton: {
-    height: hp(6.2),
-    backgroundColor: '#FFCC66', // Màu xanh dịu
-    borderRadius: 15,
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'row',
-    paddingHorizontal: 20,
-    shadowColor: '#4A90E2',
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
-  },
-  file: {
-    height: hp(30),
-    width: '100%',
-    borderRadius: theme.radius.xl,
-    overflow: 'hidden',
-    borderCurve: 'continuous',
-    padding : 15
-  },
-  delete: {
-    position: 'absolute',
-    top: 9,
-    right: 9,
-    padding: 5,
-    borderRadius: 50,
-    backgroundColor: '#FF9900'
+  submitText: {
+    color: Colors.WHITE,
+    fontSize: 18,
+    fontWeight: "bold",
   },
   disabledButton: {
-    opacity: 0.7,
-    backgroundColor: '#FFCC66',
-  }
-})
+    backgroundColor: Colors.LIGHT_PRIMARY,
+  },
+});

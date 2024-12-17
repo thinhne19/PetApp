@@ -10,9 +10,9 @@ const Favorites = () => {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerText}>Your Favorites</Text>
+        <Text style={styles.headerText}>Thú Cưng Yêu Thích Của Bạn</Text>
         <Text style={styles.subHeaderText}>
-          Browse your favorite pets here!
+          Khám phá thú cưng yêu thích của bạn tại đây!
         </Text>
       </View>
       <View style={{ padding: 20, marginTop: 20 }}>
@@ -26,19 +26,19 @@ const Favorites = () => {
               fontSize: 18,
             }}
           >
-            Add New Pet
+            Thêm Thú Cưng Mới
           </Text>
         </Link>
 
         {/* Danh sách thú cưng theo danh mục */}
         <PetListByCategory />
 
-        {/* Nút "View Favorites" */}
+        {/* Nút "Xem Yêu Thích" */}
       </View>
       <View style={styles.bottomContainer}>
         <View style={styles.favoritesBtn}>
           <Link href={"/fav-pet-list"} style={styles.favoritesText}>
-            View Favorites
+            Xem Yêu Thích
           </Link>
         </View>
       </View>

@@ -1,8 +1,8 @@
-import { View, Text } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { Stack } from "expo-router";
-import { ClerkProvider, ClerkLoaded } from "@clerk/clerk-expo";
+import { ClerkProvider } from "@clerk/clerk-expo";
 import * as SecureStore from "expo-secure-store";
+import { ActivityIndicator, View, Text } from "react-native";
 import { useFonts } from "expo-font";
 
 const tokenCache = {
@@ -10,22 +10,20 @@ const tokenCache = {
     try {
       const item = await SecureStore.getItemAsync(key);
       if (item) {
-        console.log(`${key} was used 🔐 \n`);
-      } else {
-        console.log("No values stored under key: " + key);
+        console.log(`[SecureStore] Token for ${key} retrieved.`);
       }
       return item;
     } catch (error) {
-      console.error("SecureStore get item error: ", error);
-      await SecureStore.deleteItemAsync(key);
+      console.error(`[SecureStore] Error retrieving token for ${key}:`, error);
       return null;
     }
   },
   async saveToken(key, value) {
     try {
-      return SecureStore.setItemAsync(key, value);
-    } catch (err) {
-      return;
+      await SecureStore.setItemAsync(key, value);
+      console.log(`[SecureStore] Token for ${key} saved.`);
+    } catch (error) {
+      console.error(`[SecureStore] Error saving token for ${key}:`, error);
     }
   },
 };
@@ -39,17 +37,57 @@ const _layout = () => {
     "outfit-bold": require("./../assets/fonts/Outfit-Bold.ttf"),
   });
 
+  const [clerkError, setClerkError] = useState(null);
+
   if (!fontsLoaded) {
-    return null;
+    return (
+      <View style={styles.centerContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
+        <Text>Loading fonts...</Text>
+      </View>
+    );
   }
+
+  if (!publishableKey) {
+    console.error("Clerk publishable key is missing. Please configure it.");
+    return (
+      <View style={styles.centerContainer}>
+        <Text style={{ color: "red" }}>Missing Clerk publishable key.</Text>
+      </View>
+    );
+  }
+
   return (
-    <ClerkProvider tokenCache={tokenCache} publishableKey={publishableKey}>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="(main)" options={{ headerShown: false }} />
-      </Stack>
+    <ClerkProvider
+      tokenCache={tokenCache}
+      publishableKey={publishableKey}
+      onError={(err) => {
+        console.error("ClerkProvider Error:", err);
+        setClerkError(err);
+      }}
+    >
+      {clerkError ? (
+        <View style={styles.centerContainer}>
+          <Text style={{ color: "red" }}>
+            An error occurred: {clerkError.message}
+          </Text>
+        </View>
+      ) : (
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen name="(main)" options={{ headerShown: false }} />
+        </Stack>
+      )}
     </ClerkProvider>
   );
+};
+
+const styles = {
+  centerContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
 };
 
 export default _layout;

@@ -1,11 +1,16 @@
-import { StyleSheet, Text, TextInput, View, TouchableOpacity } from 'react-native';
-import React, { useState } from 'react';
-import { theme } from '../constants/theme';
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  TouchableOpacity,
+} from "react-native";
+import React, { useState } from "react";
+import { theme } from "../constants/theme";
 
 const RichTextBox = ({ onChange, editorRef }) => {
-  const [postContent, setPostContent] = useState('');
+  const [postContent, setPostContent] = useState("");
   const [isFocused, setIsFocused] = useState(false);
-
 
   const handleContentChange = (text) => {
     setPostContent(text);
@@ -17,18 +22,13 @@ const RichTextBox = ({ onChange, editorRef }) => {
     <View style={styles.container}>
       <View style={styles.cardContainer}>
         {/* Header với emoji */}
-        <Text style={styles.header}>
-          ✨ Chia sẻ kỉ niệm của bạn ✨
-        </Text>
+        <Text style={styles.header}>✨ Chia sẽ kỷ niệm của bạn ✨</Text>
         <TextInput
           ref={editorRef}
-          style={[
-            styles.input,
-            isFocused && styles.inputFocused
-          ]}
+          style={[styles.input, isFocused && styles.inputFocused]}
           value={postContent}
           onChangeText={handleContentChange}
-          placeholder="Chia sẻ với chúng tôi nàooo!!! 🌟"
+          placeholder="Cùng thưởng thức nào! 🌟"
           placeholderTextColor="#9CA3AF"
           multiline={true}
           numberOfLines={4}
@@ -46,13 +46,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: "#F3F4F6",
   },
   cardContainer: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     borderRadius: 20,
     padding: 16,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2,
@@ -63,27 +63,27 @@ const styles = StyleSheet.create({
   },
   header: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#374151',
+    fontWeight: "600",
+    color: "#374151",
     marginBottom: 16,
-    textAlign: 'center',
+    textAlign: "center",
   },
   input: {
     minHeight: 150,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: "#F9FAFB",
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: "#E5E7EB",
     borderRadius: 15,
     padding: 16,
     marginBottom: 16,
-    textAlignVertical: 'top',
+    textAlignVertical: "top",
     fontSize: 16,
-    color: '#1F2937',
+    color: "#1F2937",
   },
   inputFocused: {
-    borderColor: '#60A5FA',
+    borderColor: "#60A5FA",
     borderWidth: 2,
-    shadowColor: '#60A5FA',
+    shadowColor: "#60A5FA",
     shadowOffset: {
       width: 0,
       height: 2,

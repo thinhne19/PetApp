@@ -1,13 +1,21 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, Alert } from 'react-native';
-import { useRoute, useNavigation } from '@react-navigation/native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
+import { useRoute, useNavigation } from "@react-navigation/native";
+import Icon from "react-native-vector-icons/MaterialIcons";
 import Colors from "../../constants/Colors";
 
 export default function MemoryDetail() {
   const route = useRoute();
   const navigation = useNavigation();
-  
+
   // Lấy dữ liệu bài viết từ route params
   const { postId } = route.params || {};
   const [post, setPost] = useState(null);
@@ -15,22 +23,22 @@ export default function MemoryDetail() {
   useEffect(() => {
     const loadPostDetails = async () => {
       try {
-        const storedPosts = await AsyncStorage.getItem('posts');
+        const storedPosts = await AsyncStorage.getItem("posts");
         const parsedPosts = storedPosts ? JSON.parse(storedPosts) : [];
-        
+
         // Tìm bài viết dựa trên postId
         const foundPost = parsedPosts.find((post) => post.id === postId);
         if (foundPost) {
           setPost(foundPost);
         } else {
-          Alert.alert('Lỗi', 'Không tìm thấy bài viết');
+          Alert.alert("Lỗi", "Không tìm thấy bài viết");
         }
       } catch (error) {
-        console.error('Error loading post details', error);
-        Alert.alert('Lỗi', 'Không thể tải bài viết');
+        console.error("Error loading post details", error);
+        Alert.alert("Lỗi", "Không thể tải bài viết");
       }
     };
-    
+
     loadPostDetails();
   }, [postId]);
 
@@ -45,7 +53,7 @@ export default function MemoryDetail() {
   return (
     <View style={styles.mainContainer}>
       <View style={styles.header}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
@@ -69,7 +77,7 @@ export default function MemoryDetail() {
               <Image source={{ uri: post.fileUri }} style={styles.image} />
             </View>
           )}
-          
+
           <Text style={styles.postBody}>{post.body}</Text>
 
           <TouchableOpacity style={styles.likeButton}>
@@ -87,8 +95,8 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.WHITE,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: 16,
     backgroundColor: Colors.LIGHT_PRIMARY,
     borderBottomRightRadius: 20,
@@ -101,7 +109,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: Colors.PRIMARY,
     marginLeft: 20,
   },
@@ -115,7 +123,7 @@ const styles = StyleSheet.create({
   post: {
     marginBottom: 16,
     padding: 16,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     borderRadius: 15,
     shadowColor: Colors.PRIMARY,
     shadowOpacity: 0.1,
@@ -125,8 +133,8 @@ const styles = StyleSheet.create({
     borderColor: Colors.LIGHT_PRIMARY,
   },
   postHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 12,
   },
   postHeaderText: {
@@ -140,7 +148,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
   },
   name: {
-    fontWeight: 'bold',
+    fontWeight: "bold",
     fontSize: 16,
     color: Colors.PRIMARY,
   },
@@ -150,11 +158,11 @@ const styles = StyleSheet.create({
   },
   imageWrapper: {
     borderRadius: 12,
-    overflow: 'hidden',
+    overflow: "hidden",
     marginVertical: 8,
   },
   image: {
-    width: '100%',
+    width: "100%",
     height: 200,
     borderRadius: 12,
   },
@@ -165,7 +173,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   likeButton: {
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
     marginTop: 12,
     padding: 4,
   },

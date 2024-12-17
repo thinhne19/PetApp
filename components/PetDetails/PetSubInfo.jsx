@@ -17,12 +17,12 @@ export default function PetSubInfo({ pet }) {
       >
         <PetSubInfoCard
           icon={require("./../../assets/images/calendar.png")}
-          title={"Age"}
+          title={"Tuổi"}
           value={pet?.age + " Years"}
         />
         <PetSubInfoCard
           icon={require("./../../assets/images/bone.png")}
-          title={"Breed"}
+          title={"Loài"}
           value={pet?.breed}
         />
       </View>
@@ -34,12 +34,12 @@ export default function PetSubInfo({ pet }) {
       >
         <PetSubInfoCard
           icon={require("./../../assets/images/sex.png")}
-          title={"Sex"}
+          title={"Giới tính"}
           value={pet?.sex}
         />
         <PetSubInfoCard
           icon={require("./../../assets/images/weight.png")}
-          title={"Weight"}
+          title={"Cân nặng"}
           value={pet?.Weight + " Kg"}
         />
       </View>

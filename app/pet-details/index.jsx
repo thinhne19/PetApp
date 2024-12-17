@@ -99,7 +99,7 @@ export default function PetDetails() {
             color={Colors.PRIMARY}
           />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>My Pets</Text>
+        <Text style={styles.headerTitle}>Vật nuôi của tôi</Text>
 
         <View style={{ flex: 1, alignItems: "flex-end" }}>
           <TouchableOpacity
@@ -136,7 +136,7 @@ export default function PetDetails() {
           }}
           style={styles.editBtn}
         >
-          <Text style={styles.editText}>Edit</Text>
+          <Text style={styles.editText}>Chỉnh sửa</Text>
         </Link>
       </View>
     </View>

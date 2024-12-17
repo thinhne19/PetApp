@@ -81,7 +81,7 @@ export default function AddNewPet() {
         await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== "granted") {
         ToastAndroid.show(
-          "Need permissions to access the gallery",
+          "Cần có quyền truy cập vào thư viện",
           ToastAndroid.SHORT
         );
         return;
@@ -102,15 +102,15 @@ export default function AddNewPet() {
           setImage(savedImageUri);
           handleInputChange("imagePath", savedImageUri);
 
-          ToastAndroid.show("Image saved successfully", ToastAndroid.SHORT);
+          ToastAndroid.show("Lưu ảnh thành công", ToastAndroid.SHORT);
         } catch (error) {
           console.error("Error saving image:", error);
-          ToastAndroid.show("Failed to save image", ToastAndroid.SHORT);
+          ToastAndroid.show("Lưu ảnh thất bại", ToastAndroid.SHORT);
         }
       }
     } catch (error) {
       console.error("Error picking image:", error);
-      ToastAndroid.show("Error selecting image", ToastAndroid.SHORT);
+      ToastAndroid.show("Lỗi chọn ảnh", ToastAndroid.SHORT);
     }
   };
 
@@ -247,7 +247,7 @@ export default function AddNewPet() {
             color={Colors.PRIMARY}
           />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Thêm Thú Cưng</Text>
+        <Text style={styles.headerTitle}>Thêm Vật Nuôi</Text>
       </View>
       <ScrollView style={{ padding: 20 }}>
         <View style={styles.imageContainer}>
@@ -255,7 +255,7 @@ export default function AddNewPet() {
         </View>
 
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>Pet Name *</Text>
+          <Text style={styles.label}>Tên vật nuôi *</Text>
           <TextInput
             style={styles.input}
             onChangeText={(value) => {
@@ -265,7 +265,7 @@ export default function AddNewPet() {
         </View>
 
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>Pet Category *</Text>
+          <Text style={styles.label}>Loài *</Text>
           <Picker
             selectedValue={selectedCategory}
             style={styles.input}
@@ -285,7 +285,7 @@ export default function AddNewPet() {
         </View>
 
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>Breed *</Text>
+          <Text style={styles.label}>Giống *</Text>
           <TextInput
             style={styles.input}
             onChangeText={(value) => {
@@ -295,7 +295,7 @@ export default function AddNewPet() {
         </View>
 
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>Age *</Text>
+          <Text style={styles.label}>Tuổi *</Text>
           <TextInput
             style={styles.input}
             onChangeText={(value) => {
@@ -305,7 +305,7 @@ export default function AddNewPet() {
         </View>
 
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>Gender *</Text>
+          <Text style={styles.label}>Giới tính *</Text>
           <Picker
             selectedValue={gender}
             style={styles.input}
@@ -320,7 +320,7 @@ export default function AddNewPet() {
         </View>
 
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>Weight *</Text>
+          <Text style={styles.label}>Cân nặng *</Text>
           <TextInput
             style={styles.input}
             onChangeText={(value) => {
@@ -330,7 +330,7 @@ export default function AddNewPet() {
         </View>
 
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>About *</Text>
+          <Text style={styles.label}>Về vật nuôi *</Text>
           <TextInput
             style={styles.input}
             numberOfLines={5}
@@ -351,9 +351,10 @@ export default function AddNewPet() {
               fontFamily: "outfit-medium",
               textAlign: "center",
               color: Colors.WHITE,
+              fontSize: 18,
             }}
           >
-            {isLoading ? "Adding Pet..." : "Submit"}
+            {isLoading ? "Đang thêm..." : "Thêm vật nuôi"}
           </Text>
         </TouchableOpacity>
       </ScrollView>

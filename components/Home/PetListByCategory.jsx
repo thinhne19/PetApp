@@ -8,20 +8,20 @@ import React, { useEffect, useState } from "react";
 
 export default function PetListByCategory() {
   const { user } = useUser();
-  const [petList, setFetList] = useState([]);
+  const [petList, setPetList] = useState([]);
   const [loader, setLoader] = useState(false);
 
   const getPetListByCategory = async (category) => {
     if (!user) {
-      console.log("No user found");
+      console.log("Không tìm thấy người dùng");
       return;
     }
 
     setLoader(true);
     try {
       const userEmail = user.emailAddresses[0].emailAddress;
-      console.log("Current User Email:", userEmail);
-      console.log("Selected Category:", category);
+      console.log("Email của người dùng hiện tại:", userEmail);
+      console.log("Danh mục được chọn:", category);
 
       const q = query(
         collection(db, "Pets"),
@@ -30,18 +30,18 @@ export default function PetListByCategory() {
       );
 
       const querySnapshot = await getDocs(q);
-      console.log("Total Pets Found:", querySnapshot.size);
+      console.log("Tổng số thú cưng được tìm thấy:", querySnapshot.size);
 
       const pets = [];
       querySnapshot.forEach((doc) => {
         const petData = { ...doc.data() };
-        console.log("Pet Data:", petData);
-        pets.push(petData); // Thêm dòng này để đưa pet vào mảng
+        console.log("Dữ liệu thú cưng:", petData);
+        pets.push(petData);
       });
 
-      setFetList(pets);
+      setPetList(pets);
     } catch (error) {
-      console.error("Error fetching pets by category:", error);
+      console.error("Lỗi khi tải danh sách thú cưng theo danh mục:", error);
     }
     setLoader(false);
   };

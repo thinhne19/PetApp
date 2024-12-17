@@ -133,29 +133,7 @@ const Login = () => {
           />
         </View>
 
-        <View style={{ flexDirection: "row", justifyContent: "center" }}>
-          <TouchableOpacity
-            onPress={onPress}
-            style={{
-              flex: 1,
-              alignItems: "center",
-              justifyContent: "center",
-              flexDirection: "row",
-              height: 52,
-              borderWidth: 1,
-              borderColor: theme.colors.grey,
-              marginRight: 4,
-              borderRadius: 10,
-            }}
-          >
-            <Image
-              source={require("../assets/images/google.png")}
-              style={{ height: 30, width: 30, marginRight: 8 }}
-              resizeMode="container"
-            />
-            <Text>Google</Text>
-          </TouchableOpacity>
-        </View>
+        <View style={{ flexDirection: "row", justifyContent: "center" }}></View>
 
         {/* foooter */}
         <View style={styles.footer}>

@@ -25,7 +25,7 @@ export default function Category({ category }) {
 
   return (
     <View style={{ marginTop: 20 }}>
-      <Text style={styles.title}>Category</Text>
+      <Text style={styles.title}>Phân loại</Text>
       <FlatList
         data={categoryList}
         numColumns={4}

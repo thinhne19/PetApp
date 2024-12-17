@@ -1,44 +1,51 @@
-import { View, Text, FlatList, Image, StyleSheet, Dimensions } from 'react-native';
-import React, { useEffect, useState } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
-import { db } from   
- '../../config/firebaseConfig';
-const Slider = () => {
+import React, { useEffect, useState } from "react";
+import { View, StyleSheet, Image, Dimensions } from "react-native";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../../config/firebaseConfig";
+import Carousel from "react-native-reanimated-carousel";
 
+const { width: screenWidth } = Dimensions.get("screen");
+
+const Slider = () => {
   const [sliderList, setSliderList] = useState([]);
 
   useEffect(() => {
     const GetSliders = async () => {
       try {
-        setSliderList([]);
-        const Snapshot = await getDocs(collection(db, 'Sliders'));
-        Snapshot.forEach((doc) => {
-          setSliderList((sliderList) => [...sliderList, doc.data()]);
-        });
+        setSliderList([]); // Reset slider list
+        const Snapshot = await getDocs(collection(db, "Sliders"));
+        const sliders = Snapshot.docs.map((doc) => doc.data());
+        setSliderList(sliders);
       } catch (error) {
-        console.error('Error fetching sliders:', error);
+        console.error("Error fetching sliders:", error);
       }
     };
 
     GetSliders();
-  }, []); // Empty dependency array to run `GetSliders` only once
+  }, []);
 
   return (
     <View style={{ marginTop: 20 }}>
-      <FlatList
-        data={sliderList}
-        horizontal // Set horizontal scrolling for the slider
-        showsHorizontalScrollIndicator={false} // Hide the scroll indicator
-        keyExtractor={(item) => item.id || Math.random().toString()} // Unique key for each item
-        renderItem={({ item }) => (
-          <View style={styles.sliderItem}>
-            <Image
-              source={{ uri: item?.imageUrl }}
-              style={styles.sliderImage}
-            />
-          </View>
-        )}
-      />
+      {sliderList.length > 0 ? (
+        <Carousel
+          loop
+          autoPlay
+          autoPlayInterval={3000} // Tự động chuyển slide mỗi 3 giây
+          data={sliderList}
+          width={screenWidth * 0.9} // Giữ nguyên kích thước FlatList
+          height={180} // Chiều cao giống FlatList ban đầu
+          mode="parallax" // Thêm hiệu ứng parallax nhẹ
+          renderItem={({ item }) => (
+            <View style={styles.sliderItem}>
+              <Image
+                source={{ uri: item?.imageUrl }}
+                style={styles.sliderImage}
+                resizeMode="cover"
+              />
+            </View>
+          )}
+        />
+      ) : null}
     </View>
   );
 };
@@ -47,12 +54,13 @@ export default Slider;
 
 const styles = StyleSheet.create({
   sliderItem: {
-    width: Dimensions.get('screen').width * 0.9, // Adjust width as needed
-    marginRight: 15, // Margin between slides
+    width: "100%",
+    height: "100%",
+    borderRadius: 15,
+    overflow: "hidden", // Bo góc cho hình ảnh
   },
   sliderImage: {
-    width: '100%', // Set width to 100% for full width within the slider item
-    height: 180,
-    borderRadius: 15,
+    width: "100%",
+    height: "100%",
   },
 });

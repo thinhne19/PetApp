@@ -62,7 +62,7 @@ export default function PetInfo({ pet }) {
               color: Colors.GRAY,
             }}
           >
-            Age : {pet?.age} Years
+            Tuổi : {pet?.age} năm tuổi
           </Text>
         </View>
         <MarkFav pet={pet} />

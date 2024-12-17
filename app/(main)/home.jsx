@@ -75,7 +75,7 @@ const Home = () => {
 
       {/* Map Preview Section */}
       <View style={styles.mapContainer}>
-        <Text style={styles.mapTitle}>Nearby Pet Services</Text>
+        <Text style={styles.mapTitle}>Dịch vụ thú cưng lân cận</Text>
         <TouchableOpacity
           style={styles.mapPreview}
           onPress={() => router.push("/map")}
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   mapContainer: {
-    marginTop: 30,
+    marginTop: 180,
   },
   mapTitle: {
     fontFamily: "outfit-medium",

@@ -15,27 +15,27 @@ const Help = () => {
 
   const faqItems = [
     {
-      question: "Làm sao để hủy lịch khám?",
+      question: "Làm cách nào để hủy cuộc hẹn?",
       answer:
-        "Để hủy lịch khám, bạn có thể vào mục 'Lịch hẹn' và chọn 'Hủy lịch'. Chúng tôi sẽ hoàn lại chi phí nếu bạn hủy trước 24 giờ.",
+        "Để hủy cuộc hẹn, hãy đến phần 'Cuộc hẹn' và chọn 'Hủy cuộc hẹn'. Chúng tôi sẽ hoàn lại phí nếu bạn hủy ít nhất 24 giờ trước.",
     },
     {
-      question: "Tôi có thể thay đổi lịch khám được không?",
+      question: "Tôi có thể đổi lịch cuộc hẹn không?",
       answer:
-        "Chắc chắn rồi! Bạn có thể vào mục 'Lịch hẹn' và chọn 'Thay đổi lịch'. Chúng tôi sẽ hỗ trợ bạn sắp xếp lịch mới phù hợp.",
+        "Dĩ nhiên! Bạn có thể đến phần 'Cuộc hẹn' và chọn 'Đổi lịch cuộc hẹn'. Chúng tôi sẽ giúp bạn sắp xếp thời gian mới phù hợp.",
     },
     {
-      question: "Tôi có thể mang thú cưng của mình đến không?",
+      question: "Tôi có thể mang theo thú cưng của mình không?",
       answer:
-        "Tất nhiên! Chúng tôi rất vui khi được gặp và chăm sóc thú cưng của bạn. Vui lòng đảm bảo rằng thú cưng đã được tiêm phòng đầy đủ và đeo rọ mõm khi đến cơ sở.",
+        "Tất nhiên! Chúng tôi rất vui mừng được gặp và chăm sóc thú cưng của bạn. Vui lòng đảm bảo thú cưng của bạn đã được tiêm phòng đầy đủ và đeo mõm khi đến thăm cơ sở của chúng tôi.",
     },
     {
-      question: "Tôi có thể thanh toán bằng hình thức nào?",
+      question: "Phương thức thanh toán nào bạn chấp nhận?",
       answer:
-        "Chúng tôi chấp nhận nhiều hình thức thanh toán như tiền mặt, thẻ tín dụng/ghi nợ, chuyển khoản ngân hàng và ví điện tử. Bạn có thể lựa chọn phương thức phù hợp nhất.",
+        "Chúng tôi chấp nhận nhiều phương thức thanh toán như tiền mặt, thẻ tín dụng/ghi nợ, chuyển khoản ngân hàng và ví điện tử. Bạn có thể chọn phương thức phù hợp nhất với mình.",
     },
     {
-      question: "Chính sách bảo mật của công ty như thế nào?",
+      question: "Chính sách bảo mật của công ty của bạn là gì?",
       answer:
         "Chúng tôi cam kết bảo vệ thông tin cá nhân của khách hàng một cách nghiêm ngặt. Thông tin của bạn sẽ không được chia sẻ với bên thứ ba mà không có sự đồng ý của bạn.",
     },
@@ -43,15 +43,16 @@ const Help = () => {
 
   const helpItems = [
     {
-      title: "Cách quản lý thú cưng",
+      title: "Cách Quản Lý Thú Cưng",
       icon: "paw",
       content:
-        "Bạn có thể dễ dàng xem lịch khám của thú cưng. Bạn có thể dễ dàng theo dõi và quản lý thông tin về thú cưng của mình",
+        "Bạn có thể dễ dàng xem lịch trình cuộc hẹn của thú cưng và thuận tiện theo dõi và quản lý thông tin của thú cưng.",
     },
     {
-      title: "Chính sách bảo mật",
+      title: "Chính Sách Bảo Mật",
       icon: "shield-check",
-      content: "Thông tin của bạn luôn được bảo vệ một cách an toàn nhất",
+      content:
+        "Thông tin của bạn luôn được bảo vệ một cách an toàn nhất có thể.",
     },
   ];
 
@@ -65,7 +66,7 @@ const Help = () => {
         >
           <MaterialCommunityIcons name="arrow-left" size={24} color="#FF8533" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Trợ giúp bạn nhé 🌟</Text>
+        <Text style={styles.headerTitle}>Đây để Hỗ Trợ Bạn 🌟</Text>
       </View>
 
       {/* Content */}
@@ -91,7 +92,7 @@ const Help = () => {
               size={24}
               color={Colors.LIGHT_PRIMARY}
             />
-            <Text style={styles.helpTitle}>Câu hỏi thường gặp</Text>
+            <Text style={styles.helpTitle}>Câu Hỏi Thường Gặp</Text>
           </View>
           {faqItems.map((faq, index) => (
             <View key={index} style={styles.faqItem}>
@@ -125,12 +126,13 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 20,
-    fontWeight: "bold",
+    fontFamily: "outfit-bold",
     color: Colors.PRIMARY,
     marginLeft: 15,
   },
   content: {
     padding: 15,
+    fontFamily: "outfit",
   },
   helpItem: {
     backgroundColor: Colors.WHITE,
@@ -156,22 +158,25 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: Colors.PRIMARY,
     marginLeft: 10,
+    fontFamily: "outfit-bold",
   },
   helpContent: {
     color: "#666",
     lineHeight: 20,
+    fontFamily: "outfit",
   },
   faqItem: {
     marginBottom: 15,
   },
   faqQuestion: {
     fontSize: 16,
-    fontWeight: "bold",
+    fontFamily: "outfit-bold",
     color: Colors.PRIMARY,
     marginBottom: 5,
   },
   faqAnswer: {
     color: "#666",
     lineHeight: 20,
+    fontFamily: "outfit",
   },
 });

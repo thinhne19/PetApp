@@ -11,24 +11,43 @@ import { useRouter } from "expo-router";
 import { useAuth, useUser } from "@clerk/clerk-expo";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Colors from "../../constants/Colors";
-
+import * as SecureStore from "expo-secure-store";
 const Profile = () => {
   const router = useRouter();
   const { signOut, isSignedIn } = useAuth();
   const { user } = useUser();
 
-  useEffect(() => {
-    if (!isSignedIn) {
-      router.push("/");
-    }
-  }, [isSignedIn]);
-
   const handleSignOut = async () => {
     try {
-      await signOut();
-      router.push("/");
+      console.log("[SignOut] Đang thực hiện đăng xuất...");
+      await signOut(); // Đăng xuất khỏi Clerk
+      console.log("[SignOut] Đăng xuất thành công!");
+
+      // Xóa token khỏi SecureStore
+      console.log("[SignOut] Xóa token khỏi SecureStore...");
+      await SecureStore.deleteItemAsync("__clerk_client_jwt");
+      console.log("[SignOut] Token đã được xóa khỏi SecureStore.");
+
+      // Kiểm tra lại SecureStore
+      await verifySecureStore();
+
+      // Điều hướng về màn hình Welcome
+      router.push("/"); // Điều hướng
     } catch (error) {
-      console.error("Sign out error:", error);
+      console.error("[SignOut] Lỗi khi đăng xuất:", error);
+    }
+  };
+
+  const verifySecureStore = async () => {
+    try {
+      const token = await SecureStore.getItemAsync("__clerk_client_jwt");
+      if (token) {
+        console.log("[SecureStore] Token sau đăng xuất:", token);
+      } else {
+        console.log("[SecureStore] Không có token nào sau đăng xuất.");
+      }
+    } catch (error) {
+      console.error("[SecureStore] Lỗi khi kiểm tra SecureStore:", error);
     }
   };
 
@@ -82,7 +101,7 @@ const Profile = () => {
               size={24}
               color={Colors.LIGHT_PINK}
             />
-            <Text style={styles.menuItemText}>Kỉ niệm ở đây</Text>
+            <Text style={styles.menuItemText}>Kỷ niệm của bạn</Text>
           </View>
           <MaterialCommunityIcons
             name="chevron-right"
@@ -92,7 +111,7 @@ const Profile = () => {
         </TouchableOpacity>
 
         {/* App Settings */}
-        <Text style={styles.sectionTitle}>🐰 Cài đặt ứng dụng</Text>
+        <Text style={styles.sectionTitle}>🐰 Chỉnh sửa ứng dụng</Text>
 
         <TouchableOpacity
           style={styles.menuItem}
@@ -100,7 +119,7 @@ const Profile = () => {
         >
           <View style={styles.menuItemLeft}>
             <MaterialCommunityIcons name="palette" size={24} color="#FF9999" />
-            <Text style={styles.menuItemText}>Giao diện dễ thương</Text>
+            <Text style={styles.menuItemText}>Giao diện người dùng</Text>
           </View>
           <MaterialCommunityIcons
             name="chevron-right"
@@ -110,7 +129,7 @@ const Profile = () => {
         </TouchableOpacity>
 
         {/* Support */}
-        <Text style={styles.sectionTitle}>🐼 Hỗ trợ & Thông tin</Text>
+        <Text style={styles.sectionTitle}>🐼 Thông tin và Hổ trợ</Text>
 
         <TouchableOpacity
           style={styles.menuItem}
@@ -122,7 +141,7 @@ const Profile = () => {
               size={24}
               color={Colors.LIGHT_PINK}
             />
-            <Text style={styles.menuItemText}>Trợ giúp bạn nhé</Text>
+            <Text style={styles.menuItemText}>Hổ trợ</Text>
           </View>
           <MaterialCommunityIcons
             name="chevron-right"
@@ -153,7 +172,7 @@ const Profile = () => {
         {/* Sign Out Button */}
         <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
           <MaterialCommunityIcons name="exit-to-app" size={24} color="#FFF" />
-          <Text style={styles.signOutText}>Tạm biệt</Text>
+          <Text style={styles.signOutText}>Đi ròi sao</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>

@@ -17,7 +17,7 @@ const Header = ({ title, mb = 10 }) => {
         <Text style={styles.title}>Trang Chủ</Text>
       </View>
       <View style={styles.icons}>
-        <Pressable onPress={() => router.push("Favorites")}>
+        <Pressable onPress={() => router.push("favorites")}>
           <Icon
             name="heart"
             size={hp(3.2)}

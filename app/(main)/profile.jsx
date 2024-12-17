@@ -109,7 +109,23 @@ const Profile = () => {
             color="#FFB366"
           />
         </TouchableOpacity>
+        {/* Scheduler */}
+        <Text style={styles.sectionTitle}>🐰 Lịch trình chăm sóc</Text>
 
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={() => router.push("/petScheduler")}
+        >
+          <View style={styles.menuItemLeft}>
+            <MaterialCommunityIcons name="calendar" size={24} color="#FF9999" />
+            <Text style={styles.menuItemText}>Lịch trình</Text>
+          </View>
+          <MaterialCommunityIcons
+            name="chevron-right"
+            size={24}
+            color="#FFB366"
+          />
+        </TouchableOpacity>
         {/* App Settings */}
         <Text style={styles.sectionTitle}>🐰 Chỉnh sửa ứng dụng</Text>
 

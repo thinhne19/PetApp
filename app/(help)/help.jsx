@@ -1,182 +1,331 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  ScrollView,
-  TouchableOpacity,
-} from "react-native";
-import React from "react";
-import { useRouter } from "expo-router";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import Colors from "../../constants/Colors";
+import React, { useState } from 'react';
+import { 
+  View, 
+  Text, 
+  Image, 
+  TouchableOpacity, 
+  StyleSheet, 
+  ScrollView, 
+  Alert 
+} from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
+import * as FileSystem from 'expo-file-system'; // Thêm import FileSystem
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const Help = () => {
-  const router = useRouter();
+// Cấu hình API key - Bạn nên thay thế bằng API key thực của mình
+const HUGGING_FACE_API_KEY = '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';
 
-  const faqItems = [
-    {
-      question: "Làm cách nào để hủy cuộc hẹn?",
-      answer:
-        "Để hủy cuộc hẹn, hãy đến phần 'Cuộc hẹn' và chọn 'Hủy cuộc hẹn'. Chúng tôi sẽ hoàn lại phí nếu bạn hủy ít nhất 24 giờ trước.",
-    },
-    {
-      question: "Tôi có thể đổi lịch cuộc hẹn không?",
-      answer:
-        "Dĩ nhiên! Bạn có thể đến phần 'Cuộc hẹn' và chọn 'Đổi lịch cuộc hẹn'. Chúng tôi sẽ giúp bạn sắp xếp thời gian mới phù hợp.",
-    },
-    {
-      question: "Tôi có thể mang theo thú cưng của mình không?",
-      answer:
-        "Tất nhiên! Chúng tôi rất vui mừng được gặp và chăm sóc thú cưng của bạn. Vui lòng đảm bảo thú cưng của bạn đã được tiêm phòng đầy đủ và đeo mõm khi đến thăm cơ sở của chúng tôi.",
-    },
-    {
-      question: "Phương thức thanh toán nào bạn chấp nhận?",
-      answer:
-        "Chúng tôi chấp nhận nhiều phương thức thanh toán như tiền mặt, thẻ tín dụng/ghi nợ, chuyển khoản ngân hàng và ví điện tử. Bạn có thể chọn phương thức phù hợp nhất với mình.",
-    },
-    {
-      question: "Chính sách bảo mật của công ty của bạn là gì?",
-      answer:
-        "Chúng tôi cam kết bảo vệ thông tin cá nhân của khách hàng một cách nghiêm ngặt. Thông tin của bạn sẽ không được chia sẻ với bên thứ ba mà không có sự đồng ý của bạn.",
-    },
-  ];
+// Nhóm các mô hình AI tiềm năng
+const AI_MODELS = [
+  'google/vit-base-patch16-224',
+  'microsoft/resnet-50',
+  'facebook/deit-base-distilled-patch16-224'
+];
 
-  const helpItems = [
-    {
-      title: "Cách Quản Lý Thú Cưng",
-      icon: "paw",
-      content:
-        "Bạn có thể dễ dàng xem lịch trình cuộc hẹn của thú cưng và thuận tiện theo dõi và quản lý thông tin của thú cưng.",
-    },
-    {
-      title: "Chính Sách Bảo Mật",
-      icon: "shield-check",
-      content:
-        "Thông tin của bạn luôn được bảo vệ một cách an toàn nhất có thể.",
-    },
-  ];
-
-  return (
-    <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => router.back()}
-        >
-          <MaterialCommunityIcons name="arrow-left" size={24} color="#FF8533" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Đây để Hỗ Trợ Bạn 🌟</Text>
-      </View>
-
-      {/* Content */}
-      <ScrollView style={styles.content}>
-        {helpItems.map((item, index) => (
-          <View key={index} style={styles.helpItem}>
-            <View style={styles.helpHeader}>
-              <MaterialCommunityIcons
-                name={item.icon}
-                size={24}
-                color={Colors.LIGHT_PINK}
-              />
-              <Text style={styles.helpTitle}>{item.title}</Text>
-            </View>
-            <Text style={styles.helpContent}>{item.content}</Text>
-          </View>
-        ))}
-
-        <View style={styles.helpItem}>
-          <View style={styles.helpHeader}>
-            <MaterialCommunityIcons
-              name="frequently-asked-questions"
-              size={24}
-              color={Colors.LIGHT_PRIMARY}
-            />
-            <Text style={styles.helpTitle}>Câu Hỏi Thường Gặp</Text>
-          </View>
-          {faqItems.map((faq, index) => (
-            <View key={index} style={styles.faqItem}>
-              <Text style={styles.faqQuestion}>{faq.question}</Text>
-              <Text style={styles.faqAnswer}>{faq.answer}</Text>
-            </View>
-          ))}
-        </View>
-      </ScrollView>
-    </View>
-  );
+// Cơ sở dữ liệu chăm sóc thú cưng 
+const PET_CARE_DATABASE = {
+  'dog': {
+    generalCare: [
+      'Cung cấp đủ nước và thức ăn chất lượng',
+      'Tập thể dục hàng ngày',
+      'Huấn luyện và xã hội hóa'
+    ],
+    healthTips: [
+      'Tiêm phòng định kỳ',
+      'Khám sức khỏe thường niên',
+      'Chăm sóc răng miệng'
+    ]
+  },
+  'cat': {
+    generalCare: [
+      'Chế độ ăn phù hợp với từng độ tuổi',
+      'Vệ sinh hộp cát thường xuyên',
+      'Chải lông để giảm rụng lông'
+    ],
+    healthTips: [
+      'Tiêm phòng đầy đủ',
+      'Khám định kỳ với bác sĩ thú y',
+      'Kiểm soát ký sinh trùng'
+    ]
+  },
 };
 
-export default Help;
+const PetRecognitionScreen = () => {
+  const [image, setImage] = useState(null);
+  const [recognitionResult, setRecognitionResult] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(null);
+
+  // Chọn ảnh từ thư viện
+  const pickImage = async () => {
+    try {
+      let permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!permissionResult.granted) {
+        Alert.alert('Quyền truy cập', 'Ứng dụng cần quyền truy cập thư viện ảnh');
+        return;
+      }
+
+      let pickerResult = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 0.7
+      });
+
+      if (!pickerResult.canceled) {
+        setImage(pickerResult.assets[0].uri);
+        setErrorMessage(null); // Xóa thông báo lỗi cũ
+        recognizePet(pickerResult.assets[0].uri);
+      }
+    } catch (error) {
+      console.error('Lỗi chọn ảnh:', error);
+      setErrorMessage('Không thể chọn ảnh. Vui lòng thử lại.');
+    }
+  };
+
+  // Chụp ảnh trực tiếp
+  const takePhoto = async () => {
+    try {
+      let permissionResult = await ImagePicker.requestCameraPermissionsAsync();
+      if (!permissionResult.granted) {
+        Alert.alert('Quyền truy cập', 'Ứng dụng cần quyền sử dụng camera');
+        return;
+      }
+
+      let pickerResult = await ImagePicker.launchCameraAsync({
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 0.7
+      });
+
+      if (!pickerResult.canceled) {
+        setImage(pickerResult.assets[0].uri);
+        setErrorMessage(null); // Xóa thông báo lỗi cũ
+        recognizePet(pickerResult.assets[0].uri);
+      }
+    } catch (error) {
+      console.error('Lỗi chụp ảnh:', error);
+      setErrorMessage('Không thể chụp ảnh. Vui lòng thử lại.');
+    }
+  };
+
+  // Nhận diện thú cưng bằng AI
+  const recognizePet = async (imageUri) => {
+    setIsLoading(true);
+    setRecognitionResult(null);
+    setErrorMessage(null);
+
+    try {
+      // Chuyển ảnh sang base64
+      const base64 = await FileSystem.readAsStringAsync(imageUri, { 
+        encoding: FileSystem.EncodingType.Base64 
+      });
+
+      // Thử các mô hình khác nhau
+      for (let model of AI_MODELS) {
+        try {
+          const response = await axios.post(
+            `https://api-inference.huggingface.co/models/${model}`,
+            { inputs: base64 },
+            {
+              headers: {
+                Authorization: `Bearer ${HUGGING_FACE_API_KEY}`,
+                'Content-Type': 'application/json'
+              },
+              timeout: 10000 // Giới hạn thời gian chờ 10 giây
+            }
+          );
+
+          const predictions = response.data;
+          const topPrediction = predictions[0];
+
+          // Nếu có kết quả
+          if (topPrediction && topPrediction.label && topPrediction.score > 0.5) {
+            const petInfo = processRecognitionResult(topPrediction);
+            setRecognitionResult(petInfo);
+            
+            // Lưu kết quả vào AsyncStorage
+            await AsyncStorage.setItem(
+              'petRecognitionHistory', 
+              JSON.stringify(petInfo)
+            );
+
+            break;
+          }
+        } catch (modelError) {
+          console.warn(`Lỗi với mô hình ${model}:`, modelError);
+        }
+      }
+    } catch (error) {
+      console.error('Lỗi nhận diện:', error);
+      setErrorMessage('Không thể nhận diện thú cưng. Vui lòng thử lại.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Xử lý kết quả nhận diện
+  const processRecognitionResult = (prediction) => {
+    const speciesLower = prediction.label.toLowerCase();
+    const species = speciesLower.includes('dog') ? 'dog' : 
+                    speciesLower.includes('cat') ? 'cat' : 
+                    speciesLower;
+
+    return {
+      species: species,
+      confidence: (prediction.score * 100).toFixed(2),
+      care: PET_CARE_DATABASE[species] || {
+        generalCare: ['Không tìm thấy thông tin chăm sóc'],
+        healthTips: ['Liên hệ chuyên gia']
+      }
+    };
+  };
+
+  return (
+    <ScrollView style={styles.container}>
+      <View style={styles.imageContainer}>
+        {image ? (
+          <Image source={{ uri: image }} style={styles.image} />
+        ) : (
+          <Text style={styles.placeholderText}>Chưa chọn ảnh</Text>
+        )}
+      </View>
+
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity 
+          style={styles.button} 
+          onPress={pickImage}
+        >
+          <Text style={styles.buttonText}>Chọn Ảnh</Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={styles.button} 
+          onPress={takePhoto}
+        >
+          <Text style={styles.buttonText}>Chụp Ảnh</Text>
+        </TouchableOpacity>
+      </View>
+
+      {isLoading && (
+        <Text style={styles.loadingText}>Đang nhận diện...</Text>
+      )}
+
+      {errorMessage && (
+        <Text style={styles.errorText}>{errorMessage}</Text>
+      )}
+
+      {recognitionResult && (
+        <View style={styles.resultContainer}>
+          <Text style={styles.resultTitle}>
+            Kết Quả: {recognitionResult.species}
+          </Text>
+          <Text style={styles.confidence}>
+            Độ Chính Xác: {recognitionResult.confidence}%
+          </Text>
+
+          <Text style={styles.sectionTitle}>Chăm Sóc Tổng Quát:</Text>
+          {recognitionResult.care.generalCare.map((tip, index) => (
+            <Text key={index} style={styles.careTip}>
+              • {tip}
+            </Text>
+          ))}
+
+          <Text style={styles.sectionTitle}>Lời Khuyên Sức Khỏe:</Text>
+          {recognitionResult.care.healthTips.map((tip, index) => (
+            <Text key={index} style={styles.careTip}>
+              • {tip}
+            </Text>
+          ))}
+        </View>
+      )}
+    </ScrollView>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.WHITE,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
     padding: 20,
-    backgroundColor: Colors.LIGHT_PRIMARY,
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
+    backgroundColor: '#FFFAF0'  // Light pastel background
   },
-  backButton: {
-    padding: 5,
+  imageContainer: {
+    alignItems: 'center',
+    marginBottom: 20
   },
-  headerTitle: {
-    fontSize: 20,
-    fontFamily: "outfit-bold",
-    color: Colors.PRIMARY,
-    marginLeft: 15,
-  },
-  content: {
-    padding: 15,
-    fontFamily: "outfit",
-  },
-  helpItem: {
-    backgroundColor: Colors.WHITE,
+  image: {
+    width: 300,
+    height: 300,
     borderRadius: 15,
+    borderWidth: 4,
+    borderColor: '#FFCC33]]',  // Tomato border for fun look
+    marginBottom: 15
+  },
+  placeholderText: {
+    fontSize: 18,
+    color: '#888',
+    fontStyle: 'italic'
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 20
+  },
+  button: {
+    backgroundColor: '#FFCC33',  // Hot pink background
     padding: 15,
-    marginBottom: 15,
-    shadowColor: Colors.PRIMARY,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowOffset: { width: 2, height: 2 },
+    elevation: 3  // Adding shadow for depth
   },
-  helpHeader: {
-    flexDirection: "row",
-    alignItems: "center",
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16
+  },
+  resultContainer: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: '#FFCC33',
+    marginTop: 20
+  },
+  resultTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#4CAF50',  // Green text for positive result
+    marginBottom: 10
+  },
+  confidence: {
+    color: '#666',
+    marginBottom: 15
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginTop: 15,
     marginBottom: 10,
+    color: '#FF6347'  // Tomato color for section titles
   },
-  helpTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: Colors.PRIMARY,
-    marginLeft: 10,
-    fontFamily: "outfit-bold",
-  },
-  helpContent: {
-    color: "#666",
-    lineHeight: 20,
-    fontFamily: "outfit",
-  },
-  faqItem: {
-    marginBottom: 15,
-  },
-  faqQuestion: {
-    fontSize: 16,
-    fontFamily: "outfit-bold",
-    color: Colors.PRIMARY,
+  careTip: {
     marginBottom: 5,
+    color: '#333'
   },
-  faqAnswer: {
-    color: "#666",
-    lineHeight: 20,
-    fontFamily: "outfit",
+  loadingText: {
+    textAlign: 'center',
+    color: '#FF6347',  // Tomato color for loading text
+    fontSize: 18,
+    marginVertical: 10
   },
+  errorText: {
+    textAlign: 'center',
+    color: '#D9534F',  // Red for error messages
+    fontSize: 16,
+    marginVertical: 10
+  }
 });
+
+export default PetRecognitionScreen;

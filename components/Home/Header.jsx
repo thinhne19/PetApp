@@ -7,6 +7,7 @@ import { hp, wp } from "../../helpers/common";
 import Icon from "../../assets/icons";
 import { useUser } from "@clerk/clerk-expo";
 import Slider from "../../components/Home/Slider";
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
 const Header = ({ title, mb = 10 }) => {
   const router = useRouter();
@@ -17,13 +18,8 @@ const Header = ({ title, mb = 10 }) => {
         <Text style={styles.title}>Trang Chủ</Text>
       </View>
       <View style={styles.icons}>
-        <Pressable onPress={() => router.push("favorites")}>
-          <Icon
-            name="heart"
-            size={hp(3.2)}
-            strokeWidth={2}
-            color={theme.colors.text}
-          />
+        <Pressable onPress={() => router.push('/help')}>
+        <MaterialCommunityIcons name="magnify" size={24} color="black" />
         </Pressable>
         <Pressable onPress={() => router.push("newPost")}>
           <Icon

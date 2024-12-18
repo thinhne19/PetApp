@@ -166,13 +166,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.WHITE,
+    marginTop: 50,
   },
   scrollContent: {
     padding: 20,
   },
   title: {
-    fontSize: 24,
-    fontWeight: "bold",
+    fontSize: 28,
+    fontFamily: "outfit-bold",
     color: Colors.PRIMARY,
     marginBottom: 20,
     textAlign: "center",

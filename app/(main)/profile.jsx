@@ -110,7 +110,7 @@ const Profile = () => {
           />
         </TouchableOpacity>
         {/* Scheduler */}
-        <Text style={styles.sectionTitle}>🐰 Lịch trình chăm sóc</Text>
+        <Text style={styles.sectionTitle}>🐰 Quản lý thú cưng</Text>
 
         <TouchableOpacity
           style={styles.menuItem}
@@ -126,6 +126,23 @@ const Profile = () => {
             color="#FFB366"
           />
         </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.menuItem}
+          // onPress={() => router.push("/advice")}
+          onPress={() => router.push("/statistics")}
+        >
+          <View style={styles.menuItemLeft}>
+            <MaterialCommunityIcons name="calendar" size={24} color="#FF9999" />
+            <Text style={styles.menuItemText}>Thống kê</Text>
+          </View>
+          <MaterialCommunityIcons
+            name="chevron-right"
+            size={24}
+            color="#FFB366"
+          />
+        </TouchableOpacity>
+
         {/* App Settings */}
         <Text style={styles.sectionTitle}>🐰 Chỉnh sửa ứng dụng</Text>
 
@@ -149,7 +166,7 @@ const Profile = () => {
 
         <TouchableOpacity
           style={styles.menuItem}
-          onPress={() => router.push("/help")}
+          onPress={() => router.push("/aboutPets")}
         >
           <View style={styles.menuItemLeft}>
             <MaterialCommunityIcons

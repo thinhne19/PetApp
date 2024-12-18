@@ -5,6 +5,7 @@ import {
   StyleSheet,
   ActivityIndicator,
   FlatList,
+  TouchableOpacity,
 } from "react-native";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "../../config/firebaseConfig";
@@ -12,11 +13,14 @@ import Colors from "../../constants/Colors";
 import { useUser } from "@clerk/clerk-expo";
 import { LineChart } from "react-native-chart-kit";
 import { useFocusEffect } from "@react-navigation/native";
+import { useRouter } from "expo-router";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 export default function PetHealthStatistics() {
   const { user } = useUser();
   const [loading, setLoading] = useState(true);
   const [pets, setPets] = useState([]);
+  const router = useRouter();
 
   // Hàm tải dữ liệu thú cưng
   const fetchPetHealthRecords = async () => {
@@ -178,6 +182,17 @@ export default function PetHealthStatistics() {
           </Text>
         )}
       />
+
+      <View style={styles.bottomContainer}>
+        <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
+          <MaterialCommunityIcons
+            name="arrow-left"
+            size={24}
+            color={Colors.WHITE}
+          />
+          <Text style={styles.textBack}>Quay Về</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -282,5 +297,29 @@ const styles = StyleSheet.create({
     color: Colors.GRAY,
     fontSize: 16,
     marginTop: 20,
+  },
+  bottomContainer: {
+    position: "absolute",
+    width: "100%",
+    bottom: 20,
+    alignItems: "center",
+  },
+  backBtn: {
+    flexDirection: "row",
+    paddingVertical: 15,
+    paddingHorizontal: 30,
+    backgroundColor: Colors.PRIMARY,
+    borderRadius: 50,
+    elevation: 5,
+    shadowColor: Colors.BLACK,
+    shadowOpacity: 0.2,
+    shadowOffset: { width: 0, height: 3 },
+    shadowRadius: 5,
+  },
+  textBack: {
+    fontFamily: "outfit-medium",
+    fontSize: 18,
+    color: Colors.WHITE,
+    textAlign: "center",
   },
 });

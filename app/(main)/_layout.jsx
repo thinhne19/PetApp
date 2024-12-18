@@ -44,7 +44,7 @@ export default function MainLayout() {
           <Tabs.Screen
             name="home"
             options={{
-              title: "Home",
+              title: "Trang chủ",
               headerShown: false,
               tabBarIcon: ({ color }) => (
                 <Ionicons name="home" size={24} color={color} />
@@ -54,7 +54,7 @@ export default function MainLayout() {
           <Tabs.Screen
             name="favorites"
             options={{
-              title: "Pet",
+              title: "Vật nuôi",
               headerShown: false,
               tabBarIcon: ({ color }) => (
                 <MaterialIcons name="pets" size={24} color={color} />
@@ -64,7 +64,7 @@ export default function MainLayout() {
           <Tabs.Screen
             name="newPost"
             options={{
-              title: "Post",
+              title: "Đăng",
               headerShown: false,
               tabBarIcon: ({ color }) => (
                 <Ionicons name="add-circle" size={24} color={color} />
@@ -72,9 +72,9 @@ export default function MainLayout() {
             }}
           />
           <Tabs.Screen
-            name="statistics"
+            name="advice"
             options={{
-              title: "Statistics",
+              title: "Khám phá",
               headerShown: false,
               tabBarIcon: ({ color }) => (
                 <MaterialCommunityIcons
@@ -88,7 +88,7 @@ export default function MainLayout() {
           <Tabs.Screen
             name="profile"
             options={{
-              title: "Profile",
+              title: "Hồ sơ",
               headerShown: false,
               tabBarIcon: ({ color }) => (
                 <Ionicons name="person" size={24} color={color} />

@@ -38,7 +38,7 @@ const Welcome = () => {
     try {
       const result = await startOAuthFlow();
       if (result?.createdSessionId) {
-        Alert.alert("Login Successful", "Please restart the app to continue.");
+        Alert.alert("Đăng nhập thành công", "Chào mừng bạn.");
       }
     } catch (error) {
       console.error("Login Error:", error);

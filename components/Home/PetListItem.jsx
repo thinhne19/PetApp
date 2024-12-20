@@ -14,7 +14,10 @@ export default function PetListItem({ pet }) {
       onPress={() =>
         router.push({
           pathname: "/pet-details",
-          params: pet,
+          params: {
+            ...pet,
+            healthRecords: JSON.stringify(pet.healthRecords),
+          },
         })
       }
       style={{

@@ -34,6 +34,30 @@ export default function PetDetails() {
       headerTitle: "",
     });
   }, []);
+  useEffect(() => {
+    if (typeof pet.healthRecords === "string") {
+      try {
+        pet.healthRecords = JSON.parse(pet.healthRecords); // Chuyển chuỗi JSON thành object
+      } catch (error) {
+        console.error("Lỗi khi parse healthRecords:", error);
+        pet.healthRecords = {
+          weightRecords: [],
+          vaccineRecords: [],
+          dewormRecords: [],
+        }; // Gán giá trị mặc định
+      }
+    } else if (
+      typeof pet.healthRecords !== "object" ||
+      pet.healthRecords === null
+    ) {
+      // Trường hợp không phải là object hoặc null
+      pet.healthRecords = {
+        weightRecords: [],
+        vaccineRecords: [],
+        dewormRecords: [],
+      };
+    }
+  }, [pet]);
 
   const handleDeletePet = () => {
     // Hiển thị hộp thoại xác nhận

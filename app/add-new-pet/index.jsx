@@ -142,19 +142,16 @@ export default function AddNewPet() {
 
   const onSubmit = async () => {
     // Kiểm tra xem đã điền đủ thông tin chưa
-    const requiredFields = [
-      "name",
-      "category",
-      "breed",
-      "age",
-      "sex",
-      "Weight",
-      "about",
-    ];
+    const requiredFields = ["name", "category", "breed", "age", "sex", "about"];
     const missingFields = requiredFields.filter((field) => !formData[field]);
 
     if (missingFields.length > 0) {
       ToastAndroid.show("Vui lòng điền đầy đủ thông tin", ToastAndroid.SHORT);
+      return;
+    }
+
+    if (!formData.weight) {
+      ToastAndroid.show("Vui lòng nhập cân nặng", ToastAndroid.SHORT);
       return;
     }
 
@@ -175,13 +172,18 @@ export default function AddNewPet() {
       // Tạo object data để lưu vào Firestore
       const petData = {
         ...formData,
-        id: petId, // Thêm ID ngay từ đầu
-        imagePath: localImagePath, // Lưu đường dẫn local của ảnh
+        id: petId,
+        imagePath: localImagePath,
         createdAt: new Date().toISOString(),
-        ownerId: user?.primaryEmailAddress?.emailAddress, // Thêm email chủ sở hữu
-        // Thêm cấu trúc healthRecords
+        ownerId: user?.primaryEmailAddress?.emailAddress,
         healthRecords: {
-          weightRecords: [],
+          weightRecords: [
+            {
+              weight: parseFloat(formData.weight), // Lấy cân nặng từ form
+              date: new Date().toLocaleDateString(),
+              notes: "Cân nặng ban đầu",
+            },
+          ],
           vaccineRecords: [],
           dewormRecords: [],
         },
@@ -324,8 +326,9 @@ export default function AddNewPet() {
           <TextInput
             style={styles.input}
             onChangeText={(value) => {
-              handleInputChange("Weight", value);
+              handleInputChange("weight", value); // Chỉ lưu giá trị cân nặng tạm thời để xử lý
             }}
+            keyboardType="numeric" // Đảm bảo nhập số
           />
         </View>
 

@@ -36,6 +36,8 @@ export default function AdviceScreen() {
           id: doc.id,
           name: doc.data().name,
           imageDict: doc.data().imageDict,
+          apiEndpoint: doc.data().apiEndpoint, // URL của API tương ứng
+          apiKey: doc.data().apiKey,
         }));
         setCategoryDict(dictData);
       } catch (error) {
@@ -97,25 +99,26 @@ export default function AdviceScreen() {
       <Section
         title="Từ điển thú cưng"
         data={categoryDict}
-        onPressAll={() => router.push("/dictAll")}
-        onPressItem={(item) =>
+        onPressItem={(item) => {
+          // Gọi API và điều hướng đến màn hình chi tiết
           router.push({
-            pathname: "/dictCategory",
-            params: { categoryName: item.name },
-          })
-        }
+            pathname: "/dictDetails", // Điều hướng đến màn hình chi tiết
+            params: {
+              apiEndpoint: item.apiEndpoint,
+              categoryName: item.name,
+              apiKey: item.apiKey,
+            },
+          });
+        }}
       />
     </ScrollView>
   );
 }
 
-const Section = ({ title, data, onPressAll, onPressItem }) => (
+const Section = ({ title, data, onPressItem }) => (
   <View style={styles.sectionContainer}>
     <View style={styles.sectionHeader}>
       <Text style={styles.sectionTitle}>{title}</Text>
-      <TouchableOpacity onPress={onPressAll}>
-        <Text style={styles.viewAll}>Xem tất cả</Text>
-      </TouchableOpacity>
     </View>
     <FlatList
       data={data}
